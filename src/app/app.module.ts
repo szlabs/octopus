@@ -8,12 +8,20 @@ import { AppComponent } from './app.component';
 import { ROUTING } from "./app.routing";
 import { HomeComponent } from "./home/home.component";
 import { AboutComponent } from "./about/about.component";
+import { RegistryComponent } from './registry/registry.component';
+import { PolicyComponent } from './policy/policy.component';
+import { LoginComponent } from './login/login.component';
+import { ShellComponent } from './shell/shell.component';
 
 @NgModule({
     declarations: [
         AppComponent,
         AboutComponent,
-        HomeComponent
+        HomeComponent,
+        RegistryComponent,
+        PolicyComponent,
+        LoginComponent,
+        ShellComponent
     ],
     imports: [
         BrowserAnimationsModule,

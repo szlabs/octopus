@@ -8,6 +8,12 @@ import { ClarityModule } from "@clr/angular";
 import { ROUTING } from "./app.routing";
 import { APP_BASE_HREF } from "@angular/common";
 
+import { RegistryComponent } from './registry/registry.component'
+import { PolicyComponent } from './policy/policy.component'
+import { LoginComponent } from './login/login.component';
+import { ShellComponent } from './shell/shell.component';
+
+
 describe('AppComponent', () => {
 
     let fixture: ComponentFixture<any>;
@@ -18,7 +24,11 @@ describe('AppComponent', () => {
             declarations: [
                 AppComponent,
                 AboutComponent,
-                HomeComponent
+                HomeComponent,
+                RegistryComponent,
+                PolicyComponent,
+                LoginComponent,
+                ShellComponent,
             ],
             imports: [
                 ClarityModule.forRoot(),

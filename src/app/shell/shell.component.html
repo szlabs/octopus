@@ -1,0 +1,41 @@
+<clr-main-container>
+  <clr-header class="header header-5">
+    <div class="branding">
+      <a href="#" class="nav-link">
+        <span class="clr-icon clr-clarity-logo"></span>
+        <span class="title">Topological Replication</span>
+      </a>
+    </div>
+      <div class="header-nav" [clr-nav-level]="1">
+          <a class="nav-link" href="#" [routerLink]="['./about']" routerLinkActive="active"><span class="nav-text">About</span></a>
+      </div>
+    <div class="header-actions">
+      <a href="javascript:void(0);" class="nav-link nav-text logged-usr">Administrator</a>
+      <clr-dropdown>
+            <button class="nav-icon" clrDropdownTrigger>
+                <clr-icon shape="user"></clr-icon>
+                <clr-icon shape="caret down"></clr-icon>
+            </button>
+            <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
+                <a href="..." clrDropdownItem>About</a>
+                <a href="..." clrDropdownItem>Log out</a>
+            </clr-dropdown-menu>
+        </clr-dropdown>
+    </div>
+  </clr-header>
+  <div class="content-container">
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+    <clr-vertical-nav>
+    <a clrVerticalNavLink routerLink="./registries" routerLinkActive="active">
+        <clr-icon clrVerticalNavIcon shape="layers"></clr-icon>
+        Registries
+    </a>
+    <a clrVerticalNavLink routerLink="./policies" routerLinkActive="active">
+        <clr-icon clrVerticalNavIcon shape="organization"></clr-icon>
+        Policies
+    </a>
+</clr-vertical-nav>
+  </div>
+</clr-main-container>

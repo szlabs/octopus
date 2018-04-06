@@ -8,12 +8,26 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { AboutComponent } from './about/about.component';
 import { HomeComponent } from './home/home.component';
+import { RegistryComponent } from './registry/registry.component'
+import { PolicyComponent } from './policy/policy.component'
+import { LoginComponent } from './login/login.component';
+import { ShellComponent } from './shell/shell.component';
+
 
 
 export const ROUTES: Routes = [
-    {path: '', redirectTo: 'home', pathMatch: 'full'},
-    {path: 'home', component: HomeComponent},
-    {path: 'about', component: AboutComponent}
+    {path: '', redirectTo: 'harbor', pathMatch: 'full'},
+    {path: 'login', component: LoginComponent},
+    {
+    	path: 'harbor', 
+    	component: ShellComponent,
+    	children:[
+    	  {path: '', redirectTo: 'registries', pathMatch: 'full'},
+    	  {path: 'registries', component: RegistryComponent},
+          {path: 'policies', component: PolicyComponent},
+          {path: 'about', component: AboutComponent}
+    	]
+    }
 ];
 
 export const ROUTING: ModuleWithProviders = RouterModule.forRoot(ROUTES);
