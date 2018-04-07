@@ -6,10 +6,18 @@
 import { Component } from '@angular/core';
 
 @Component({
+	selector: "about-dialog",
     styleUrls: ['./about.component.scss'],
     templateUrl: './about.component.html'
 })
 export class AboutComponent {
-    open: Boolean = false;
+    opened: Boolean = false;
 
+    open(){
+      this.opened = true;
+    }
+
+    close(){
+    	this.opened = false;
+    }
 }

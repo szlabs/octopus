@@ -1,0 +1,35 @@
+<div class="card">
+    <div class="card-header">
+        {{data.ID}}:{{data.name}}
+    </div>
+    <div class="card-block">
+    	<div class="progress top" [ngClass]="progressClass">
+            <progress value="100" max="100"></progress>
+        </div>
+        <div class="card-media-block">
+            <img [attr.src]="imgSrc" class="card-media-image">
+            <div class="card-media-description">
+                <span class="card-media-title">
+                    Address: {{data.address}}
+                </span>
+                <span class="card-media-text">
+                    Status: {{data.status}}
+                </span>
+            </div>
+        </div>
+        <div class="card-text card-body">
+            Create Time: {{createTime}}
+        </div>
+    </div>
+    <div class="card-footer">
+        <button type="button" class="btn btn-icon btn-link" title="edit server" (click)="edit()">
+        	<clr-icon shape="pencil"></clr-icon>
+        </button>
+        <button type="button" class="btn btn-icon btn-link" title="ping server" (click)="ping()">
+        	<clr-icon shape="bolt"></clr-icon>
+        </button>
+        <button type="button" class="btn btn-icon btn-danger" title="delete server" (click)="delete()">
+        	<clr-icon shape="trash"></clr-icon>
+        </button>
+    </div>
+</div>

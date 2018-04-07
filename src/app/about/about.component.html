@@ -1,17 +1,10 @@
-<!--
-  ~ Copyright (c) 2016 VMware, Inc. All Rights Reserved.
-  ~ This software is released under MIT license.
-  ~ The full license information can be found in LICENSE in the root directory of this project.
-  -->
-<p>This is a page to help demonstrate routing.</p>
-<button class="btn btn-primary" (click)="open = true">Show modal</button>
-<clr-modal [(clrModalOpen)]="open">
-  <h3 class="modal-title">I have a nice title</h3>
+<clr-modal [(clrModalOpen)]="opened">
+  <h3 class="modal-title">Project Octopus</h3>
   <div class="modal-body">
-    <p>But not much to say...</p>
+    <label>Version:</label><span class="version">0.1.0</span>
+    <p>Project Octopus provides a drag and drop conductor for user to create topological policies which are used to replicate container images among multiple sites effectively on the top view. </p>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="open = false">Cancel</button>
-    <button type="button" class="btn btn-primary" (click)="open = false">Ok</button>
+    <button type="button" class="btn btn-primary" (click)="close()">Close</button>
   </div>
 </clr-modal>

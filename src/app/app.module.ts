@@ -6,22 +6,25 @@ import { HttpModule } from '@angular/http';
 import { ClarityModule } from '@clr/angular';
 import { AppComponent } from './app.component';
 import { ROUTING } from "./app.routing";
-import { HomeComponent } from "./home/home.component";
 import { AboutComponent } from "./about/about.component";
 import { RegistryComponent } from './registry/registry.component';
 import { PolicyComponent } from './policy/policy.component';
 import { LoginComponent } from './login/login.component';
 import { ShellComponent } from './shell/shell.component';
+import { AuthGuard } from './guard/auth.guard';
+import { AuthService } from './service/auth.service';
+import { RegistryServerComponent } from './registry-server/registry-server.component';
+
 
 @NgModule({
     declarations: [
         AppComponent,
         AboutComponent,
-        HomeComponent,
         RegistryComponent,
         PolicyComponent,
         LoginComponent,
-        ShellComponent
+        ShellComponent,
+        RegistryServerComponent
     ],
     imports: [
         BrowserAnimationsModule,
@@ -31,7 +34,10 @@ import { ShellComponent } from './shell/shell.component';
         ClarityModule,
         ROUTING
     ],
-    providers: [],
+    providers: [
+        AuthService,
+        AuthGuard
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -10,7 +10,7 @@ import { AboutComponent } from './about.component';
 
 describe('AboutComponent', () => {
 
-    let expectedMsg: string = 'This is a page to help demonstrate routing.';
+    let expectedMsg: string = 'Project Octopus provides a drag and drop conductor for user';
 
     let fixture: ComponentFixture<any>;
     let compiled: any;
@@ -40,7 +40,7 @@ describe('AboutComponent', () => {
     }));
 
     it(`should display: "${expectedMsg}"`, async(() => {
-        expect(compiled.querySelector("p").textContent).toMatch(expectedMsg);
+        expect(compiled.querySelector("p").textContent).toContain(expectedMsg);
     }));
 
 

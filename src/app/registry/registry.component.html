@@ -1,3 +1,18 @@
-<p>
-  registry works!
-</p>
+<div>
+	<div>
+		<h3>Registries</h3>
+	</div>
+	<div>
+		<button type="button" class="btn btn-icon btn-primary">
+			<clr-icon shape="add"></clr-icon>
+			ADD Registry
+		</button>
+	</div>
+	<div id="registry-container">
+		<div class="row">
+			<div class="col-lg-4 col-md-12 col-sm-12 col-xs-12" *ngFor="let reg of registries">
+				<app-registry-server [data]="reg" (editServer)="editServer($event)" (deleteServer)="deleteServer($event)" (pingServer)="pingServer($event)"></app-registry-server>
+			</div>
+		</div>
+	</div>
+</div>
