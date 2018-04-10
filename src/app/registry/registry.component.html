@@ -3,7 +3,7 @@
 		<h3>Registries</h3>
 	</div>
 	<div>
-		<button type="button" class="btn btn-icon btn-primary">
+		<button type="button" class="btn btn-icon btn-primary" (click)="addServer()">
 			<clr-icon shape="add"></clr-icon>
 			ADD Registry
 		</button>
@@ -14,5 +14,8 @@
 				<app-registry-server [data]="reg" (editServer)="editServer($event)" (deleteServer)="deleteServer($event)" (pingServer)="pingServer($event)"></app-registry-server>
 			</div>
 		</div>
+	</div>
+	<div class="view-side-form">
+		<router-outlet></router-outlet>
 	</div>
 </div>

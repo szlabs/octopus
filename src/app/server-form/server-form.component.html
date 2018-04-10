@@ -1,0 +1,62 @@
+<<div class="side-form">
+<form #serverForm="ngForm" (ngSubmit)="onSubmit()" [hidden]="submitted" class="compact">
+    <section class="form-block">
+        <label>{{title}} Registry Server Information</label>
+        <div class="form-group">
+            <label for="serverID">Server ID</label>
+            <input type="text" id="serverID" placeholder="srv_random"
+                    disabled 
+                    name="serverID"
+                    [(ngModel)]="model.ID"
+                    #serverID="ngModel" class="input-box">
+        </div>
+        <div class="form-group">
+            <label for="serverName">Server Name</label>
+            <label for="serverName"
+                aria-haspopup="true"
+                role="tooltip"
+                class="tooltip tooltip-validation tooltip-md tooltip-top-left"
+                [class.invalid]="serverNameInput.invalid && (serverNameInput.dirty || serverNameInput.touched)">
+                <input type="text" id="serverName" placeholder="Enter registry server name"
+                    required
+                    name="serverName"
+                    [(ngModel)]="model.name"
+                    #serverNameInput="ngModel" class="input-box">
+                <span class="tooltip-content">
+                    Server Name is Required.
+                </span>
+            </label>
+        </div>
+        <div class="form-group">
+            <label for="serverAddr">Server Address</label>
+            <label for="serverAddr"
+                aria-haspopup="true"
+                role="tooltip"
+                class="tooltip tooltip-validation tooltip-md tooltip-top-left"
+                [class.invalid]="serverAddrInput.invalid && (serverAddrInput.dirty || serverAddrInput.touched)">
+                <input type="text" id="serverAddr" placeholder="Enter registry address"
+                    required
+                    name="serverAddr"
+                    [(ngModel)]="model.lastName"
+                    #serverAddrInput="ngModel" class="input-box">
+                <span class="tooltip-content">
+                    Server Address is Required.
+                </span>
+            </label>
+        </div>
+        <div class="form-group">
+            <label for="regType">Registry Type</label>
+            <div class="select">
+                <select id="regType"
+                    name="registryType"
+                    [(ngModel)]="model.kind" class="input-box">
+                    <option value="Unknown" selected>Select Registry Kind...</option>
+                    <option *ngFor="let kind of allKinds" [value]="kind">{{kind}}</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit" [disabled]="serverForm.form.invalid">Add</button>
+        <button class="btn btn-outline" type="button" (click)="cancel()">Cancel</button>
+    </section>
+</form>
+</div>

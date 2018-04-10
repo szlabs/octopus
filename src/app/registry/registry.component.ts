@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { RegistryServer } from '../interface/registry-server';
 import { RegistryStatus } from '../interface/registry-status.enum';
 import { RegistryKind } from '../interface/registry-kind.enum';
+import { Router } from '@angular/router';
+import { ROUTES } from '../consts';
 
 @Component({
   selector: 'app-registry',
@@ -12,7 +14,9 @@ export class RegistryComponent implements OnInit {
   
   registries: RegistryServer[] = [];
 
-  constructor() { }
+  constructor(
+    private router: Router
+    ) { }
 
   ngOnInit() {
   	//mock some data
@@ -31,7 +35,7 @@ export class RegistryComponent implements OnInit {
   }
 
   editServer(server: RegistryServer): void {
-  	console.debug("edit", server);
+    this.router.navigateByUrl(ROUTES.EDIT_REGISTRY+"/"+server.ID)
   }
 
   deleteServer(server: RegistryServer): void {
@@ -40,6 +44,10 @@ export class RegistryComponent implements OnInit {
 
   pingServer(server: RegistryServer): void {
   	console.debug("ping", server);
+  }
+
+  addServer(){
+    this.router.navigateByUrl(ROUTES.ADD_REGISTRY)
   }
 
 }

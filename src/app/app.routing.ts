@@ -12,7 +12,8 @@ import { PolicyComponent } from './policy/policy.component'
 import { LoginComponent } from './login/login.component';
 import { ShellComponent } from './shell/shell.component';
 import { AuthGuard } from './guard/auth.guard';
-
+import { ServerFormComponent } from './server-form/server-form.component';
+import { TopologyBuilderComponent } from './topology-builder/topology-builder.component';
 
 
 export const ROUTES: Routes = [
@@ -24,9 +25,22 @@ export const ROUTES: Routes = [
     	//canActivateChild: [AuthGuard],
     	children:[
     	  {path: '', redirectTo: 'registries', pathMatch: 'full'},
-    	  {path: 'registries', component: RegistryComponent},
-          {path: 'policies', component: PolicyComponent},
-          {path: 'about', component: AboutComponent}
+    	  {
+              path: 'registries', 
+              component: RegistryComponent,
+              children: [
+                {path: 'add', component: ServerFormComponent},
+                {path: 'edit/:id', component: ServerFormComponent},
+              ]
+          },
+          {
+              path: 'policies', 
+              component: PolicyComponent,
+              children: [
+                {path: 'build', component: TopologyBuilderComponent},
+                {path: 'edit/:id', component: TopologyBuilderComponent},
+              ]
+          }
     	]
     },
     {path: '**', redirectTo: 'harbor', pathMatch: 'full'}

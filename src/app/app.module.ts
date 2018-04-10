@@ -14,7 +14,9 @@ import { ShellComponent } from './shell/shell.component';
 import { AuthGuard } from './guard/auth.guard';
 import { AuthService } from './service/auth.service';
 import { RegistryServerComponent } from './registry-server/registry-server.component';
-
+import { ServerFormComponent } from './server-form/server-form.component';
+import { TopologyBuilderComponent } from './topology-builder/topology-builder.component';
+import { VisModule } from 'ng2-vis';
 
 @NgModule({
     declarations: [
@@ -24,7 +26,9 @@ import { RegistryServerComponent } from './registry-server/registry-server.compo
         PolicyComponent,
         LoginComponent,
         ShellComponent,
-        RegistryServerComponent
+        RegistryServerComponent,
+        ServerFormComponent,
+        TopologyBuilderComponent
     ],
     imports: [
         BrowserAnimationsModule,
@@ -32,7 +36,8 @@ import { RegistryServerComponent } from './registry-server/registry-server.compo
         FormsModule,
         HttpModule,
         ClarityModule,
-        ROUTING
+        ROUTING,
+        VisModule
     ],
     providers: [
         AuthService,

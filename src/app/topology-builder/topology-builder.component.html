@@ -1,0 +1,16 @@
+<div class="row">
+	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+		<div>
+		  <button type="button" class="btn btn-icon" (click)="onAdd()">
+		  	<clr-icon shape="home"></clr-icon>ADD
+		  </button>
+		</div>
+	</div>
+	<div class="col-xs-8 col-sm-8 col-md-8 col-lg-10 col-xl-10">
+		<div class="network-canvas"
+        [visNetwork]="visNetwork"
+        [visNetworkData]="visNetworkData"
+        [visNetworkOptions]="visNetworkOptions"
+        (initialized)="networkInitialized()"></div>
+	</div>
+</div>

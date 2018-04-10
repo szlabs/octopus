@@ -2,11 +2,14 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { RegistryServer } from '../interface/registry-server';
 import { RegistryKind } from '../interface/registry-kind.enum';
 import { RegistryStatus } from '../interface/registry-status.enum';
+import { FadeInAnimation } from '../_animations/index';
 
 @Component({
   selector: 'app-registry-server',
   templateUrl: './registry-server.component.html',
-  styleUrls: ['./registry-server.component.scss']
+  styleUrls: ['./registry-server.component.scss'],
+  animations: [FadeInAnimation],
+  host: { '[@FadeInAnimation]': '' }
 })
 export class RegistryServerComponent implements OnInit {
   
