@@ -1,13 +1,18 @@
 package main
 
-import(
-	"fmt"
+import (
+	"encoding/gob"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
-	"github.com/gorilla/mux"
-	"github.com/gorilla/handlers"
 	"os"
+
+	"github.com/steven-zou/topological-replication/server/model"
+
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/steven-zou/topological-replication/server/api"
 	"github.com/steven-zou/topological-replication/server/core"
 	"github.com/steven-zou/topological-replication/server/metadata"
@@ -18,38 +23,29 @@ var (
 	path string
 )
 
-func main(){
+func main() {
 	flag.StringVar(&path, "f", "", "The file path which is used to store metadata")
 	flag.IntVar(&port, "p", 8080, "The port that the server listens on")
 	flag.Parse()
-	if len(path) == 0{
+	if len(path) == 0 {
 		log.Printf("metadata file should be specified \n")
 		flag.Usage()
 		return
 	}
 
-	if _, err := os.Stat(path); err != nil{
-		if !os.IsNotExist(err){
-			log.Panic(err)
-		}
-		file, err := os.Create(path)
-		if err != nil{
-			log.Panic(err)
-		}
-		file.Close()
+	if err := initMetadataStore(path); err != nil {
+		log.Fatal(err)
 	}
 
-	metadata.DefaultStore = &metadata.Store{
-		File: path,
-	}
-	core.DefaultRegMgr = &core.RegistryManager{
-		MetadataStore: metadata.DefaultStore,
-	}
-	core.DefaultTopologyMgr = &core.TopologyManager{
-		MetadataStore: metadata.DefaultStore,
-	}
+	initSessionStore()
 
-	router := mux.NewRouter().PathPrefix("/api/v1").Subrouter()
+	initResourceManager()
+
+	router := mux.NewRouter().StrictSlash(true).PathPrefix("/api/v1").Subrouter()
+	router.NewRoute().Path("/login").Methods(http.MethodPost).
+		HandlerFunc(api.Login)
+	router.NewRoute().Path("/logout").Methods(http.MethodPost).
+		HandlerFunc(api.Logout)
 	router.NewRoute().Path("/registries").Methods(http.MethodGet).
 		HandlerFunc(api.ListRegistry)
 	router.NewRoute().Path("/registries").Methods(http.MethodPost).
@@ -66,7 +62,42 @@ func main(){
 		HandlerFunc(api.CreateEdge)
 	router.NewRoute().Path("/topology/edges/{id}").Methods(http.MethodDelete).
 		HandlerFunc(api.DeleteEdge)
+	router.NewRoute().Path("/topology/edges/{id}/status").Methods(http.MethodGet).
+		HandlerFunc(api.GetEdgeStatus)
 
-	handler := handlers.LoggingHandler(os.Stdout, router)
+	authHandler := api.NewAuthHandler(router, "/api/v1/login", "/api/v1/logout")
+	handler := handlers.LoggingHandler(os.Stdout, authHandler)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), handler))
+}
+
+func initMetadataStore(path string) error {
+	if _, err := os.Stat(path); err != nil {
+		if !os.IsNotExist(err) {
+			return err
+		}
+		file, err := os.Create(path)
+		if err != nil {
+			return err
+		}
+		file.Close()
+	}
+
+	metadata.DefaultStore = &metadata.Store{
+		File: path,
+	}
+	return nil
+}
+
+func initSessionStore() {
+	gob.Register(&model.User{})
+	api.SessionStore = sessions.NewCookieStore([]byte("secret"))
+}
+
+func initResourceManager() {
+	core.DefaultRegMgr = &core.RegistryManager{
+		MetadataStore: metadata.DefaultStore,
+	}
+	core.DefaultTopologyMgr = &core.TopologyManager{
+		MetadataStore: metadata.DefaultStore,
+	}
 }

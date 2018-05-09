@@ -1,24 +1,26 @@
 package util
 
-import(
-	"fmt"
-	"strconv"
+import (
 	"bytes"
-	"encoding/json"
-	"net/http"
-	"io/ioutil"
-	"strings"
 	"crypto/tls"
-	common_http "github.com/vmware/harbor/src/common/http"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
+
 	"github.com/steven-zou/topological-replication/server/model"
+	common_http "github.com/vmware/harbor/src/common/http"
 )
 
-type Client struct{
+type Client struct {
 	*common_http.Client
 	url string
 }
 
-func New(url, username, password string, insecure bool) *Client{
+func New(url, username, password string, insecure bool) *Client {
 	c := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -31,26 +33,26 @@ func New(url, username, password string, insecure bool) *Client{
 		password: password,
 	})
 	cc := &Client{
-		url :url,
+		url: url,
 	}
 	cc.Client = client
 	return cc
 }
 
-type basicAuthModifier struct{
+type basicAuthModifier struct {
 	username string
 	password string
 }
 
-func (b *basicAuthModifier) Modify(r *http.Request) error{
+func (b *basicAuthModifier) Modify(r *http.Request) error {
 	r.SetBasicAuth(b.username, b.password)
 	return nil
 }
 
-func (c *Client) CreateTarget(target *model.Registry)(int64, error){
+func (c *Client) CreateTarget(target *model.Registry) (int64, error) {
 	t := &harborTarget{
-		Name: target.Name,
-		URL: target.URL,
+		Name:     target.Name,
+		URL:      target.URL,
 		Username: target.Username,
 		Password: target.Password,
 		Insecure: target.Insecure,
@@ -58,44 +60,57 @@ func (c *Client) CreateTarget(target *model.Registry)(int64, error){
 	return c.post("/api/targets", t)
 }
 
-func (c *Client) TargetExist(url, username string, insecure bool)(bool, int64, error){
+func (c *Client) TargetExist(url, username string, insecure bool) (bool, int64, error) {
 	targets := []*harborTarget{}
-	if err := c.Get(c.url+"/api/targets", &targets); err != nil{
+	if err := c.Get(c.url+"/api/targets", &targets); err != nil {
 		return false, 0, err
 	}
-	for _, target := range targets{
-		if target.URL == url && target.Username == username && 
-			target.Insecure == insecure{
+	for _, target := range targets {
+		if target.URL == url && target.Username == username &&
+			target.Insecure == insecure {
 			return true, target.ID, nil
 		}
 	}
 	return false, 0, nil
 }
 
-func (c *Client) DeleteTarget(id int64) error{
+func (c *Client) DeleteTarget(id int64) error {
 	return c.Delete(fmt.Sprintf("%s/api/targets/%d", c.url, id))
 }
 
-func (c *Client) CreatePolicy(policy *Policy)(int64, error){
+func (c *Client) CreatePolicy(policy *Policy) (int64, error) {
 	return c.post("/api/policies/replication", policy)
 }
 
-func (c *Client) DeletePolicy(id int64) error{
+func (c *Client) DeletePolicy(id int64) error {
 	return c.Delete(fmt.Sprintf("%s/api/policies/replication/%d", c.url, id))
 }
 
-func (c *Client) post(path string, v interface{}) (int64, error){
+func (c *Client) GetJobs(policyID int64) ([]*model.Job, error) {
+	u, err := url.Parse(fmt.Sprintf("%s/api/jobs/replication", c.url))
+	if err != nil {
+		return nil, err
+	}
+	query := u.Query()
+	query.Add("policy_id", strconv.FormatInt(policyID, 10))
+	u.RawQuery = query.Encode()
+	jobs := []*model.Job{}
+	err = c.Get(u.String(), &jobs)
+	return jobs, err
+}
+
+func (c *Client) post(path string, v interface{}) (int64, error) {
 	data, err := json.Marshal(v)
-	if err != nil{
+	if err != nil {
 		return 0, err
 	}
-	req, err := http.NewRequest(http.MethodPost, c.url + path, bytes.NewReader(data))
-	if err != nil{
+	req, err := http.NewRequest(http.MethodPost, c.url+path, bytes.NewReader(data))
+	if err != nil {
 		return 0, err
 	}
 	req.Header.Add("Content-Type", "application/json")
 	resp, err := c.Do(req)
-	if err != nil{
+	if err != nil {
 		return 0, err
 	}
 	defer resp.Body.Close()

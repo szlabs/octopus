@@ -1,44 +1,45 @@
 package metadata
 
-import(
+import (
 	"encoding/json"
-	"sync"
 	"io/ioutil"
-	"github.com/steven-zou/topological-replication/server/model"
+	"sync"
+
 	uuid "github.com/satori/go.uuid"
+	"github.com/steven-zou/topological-replication/server/model"
 )
 
 var (
 	DefaultStore *Store
-)	
+)
 
-type metadata struct{
+type metadata struct {
 	Registries []*model.Registry `json:"registries"`
-	Topology *model.Topology `json:"topology"`
+	Topology   *model.Topology   `json:"topology"`
 }
 
-type Store struct{
+type Store struct {
 	File string
 	sync.RWMutex
 }
 
-func (s *Store) ListRegistries() ([]*model.Registry, error){
+func (s *Store) ListRegistries() ([]*model.Registry, error) {
 	s.RLock()
 	defer s.RUnlock()
 
 	metadata, err := s.read()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
-	if metadata == nil{
+	if metadata == nil {
 		return nil, nil
 	}
 	return metadata.Registries, nil
 }
 
-func (s *Store) GetRegistry(id string) (*model.Registry, error){
+func (s *Store) GetRegistry(id string) (*model.Registry, error) {
 	registries, err := s.ListRegistries()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	for _, registry := range registries {
@@ -49,38 +50,34 @@ func (s *Store) GetRegistry(id string) (*model.Registry, error){
 	return nil, nil
 }
 
-func (s *Store) AddRegistry(registry *model.Registry) (string, error){
+func (s *Store) AddRegistry(registry *model.Registry) (string, error) {
 	s.Lock()
 	defer s.Unlock()
 
 	metadata, err := s.read()
-	if err != nil{
+	if err != nil {
 		return "", err
 	}
 
-	id, err := uuid.NewV4()
-	if err != nil{
-		return "", err
-	}
-	registry.ID = id.String()
+	registry.ID = uuid.NewV4().String()
 	metadata.Registries = append(metadata.Registries, registry)
-	if err = s.write(metadata); err != nil{
+	if err = s.write(metadata); err != nil {
 		return "", err
 	}
 	return registry.ID, nil
 }
 
-func (s *Store) DeleteRegistry(id string) error{
+func (s *Store) DeleteRegistry(id string) error {
 	s.Lock()
 	defer s.Unlock()
 
 	metadata, err := s.read()
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	var i int = -1
 	var registry *model.Registry
-	for i, registry = range metadata.Registries{
+	for i, registry = range metadata.Registries {
 		if registry.ID == id {
 			break
 		}
@@ -93,30 +90,30 @@ func (s *Store) DeleteRegistry(id string) error{
 	return s.write(metadata)
 }
 
-func (s *Store) GetTopology()(*model.Topology, error){
+func (s *Store) GetTopology() (*model.Topology, error) {
 	s.RLock()
 	defer s.RUnlock()
 
 	metadata, err := s.read()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
-	if metadata == nil{
+	if metadata == nil {
 		return nil, nil
 	}
 	return metadata.Topology, nil
 }
 
-func (s *Store) GetTopologyNode(id string)(*model.Registry, error){
+func (s *Store) GetTopologyNode(id string) (*model.Registry, error) {
 	topology, err := s.GetTopology()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
-	if topology == nil{
+	if topology == nil {
 		return nil, err
 	}
-	for _, node := range topology.Nodes{
-		if node.ID == id{
+	for _, node := range topology.Nodes {
+		if node.ID == id {
 			return node, nil
 		}
 	}
@@ -128,15 +125,15 @@ func (s *Store) AddTopologyNode(id string) error {
 	defer s.Unlock()
 
 	meta, err := s.read()
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
-	if meta == nil{
+	if meta == nil {
 		meta = &metadata{}
 	}
 
-	if meta.Topology == nil{
+	if meta.Topology == nil {
 		meta.Topology = &model.Topology{}
 	}
 
@@ -151,68 +148,64 @@ func (s *Store) DeleteTopologyNode(id string) error {
 	defer s.Unlock()
 
 	meta, err := s.read()
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
-	if meta == nil || meta.Topology == nil{
+	if meta == nil || meta.Topology == nil {
 		return nil
 	}
 	i := -1
-	for j, node := range meta.Topology.Nodes{
-		if node.ID == id{
+	for j, node := range meta.Topology.Nodes {
+		if node.ID == id {
 			i = j
 			break
 		}
 	}
-	if i == -1{
+	if i == -1 {
 		return nil
 	}
 	meta.Topology.Nodes = append(meta.Topology.Nodes[:i], meta.Topology.Nodes[i+1:]...)
 	return s.write(meta)
 }
 
-func (s *Store) GetTopologyEdge(id string)(*model.Edge, error){
+func (s *Store) GetTopologyEdge(id string) (*model.Edge, error) {
 	s.RLock()
 	defer s.RUnlock()
 
 	topology, err := s.GetTopology()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	if topology == nil {
 		return nil, nil
 	}
-	for _, edge := range topology.Edges{
-		if edge.ID == id{
+	for _, edge := range topology.Edges {
+		if edge.ID == id {
 			return edge, nil
 		}
 	}
 	return nil, nil
 }
 
-func (s *Store) CreateTopologyEdge(edge *model.Edge)(string, error){
+func (s *Store) CreateTopologyEdge(edge *model.Edge) (string, error) {
 	s.Lock()
 	defer s.Unlock()
 
 	meta, err := s.read()
-	if err != nil{
+	if err != nil {
 		return "", err
 	}
-	if meta == nil{
+	if meta == nil {
 		meta = &metadata{}
 	}
-	if meta.Topology == nil{
+	if meta.Topology == nil {
 		meta.Topology = &model.Topology{}
 	}
 
-	id, err := uuid.NewV4()
-	if err != nil{
-		return "", err
-	}
-	edge.ID = id.String()
+	edge.ID = uuid.NewV4().String()
 	meta.Topology.Edges = append(meta.Topology.Edges, edge)
-	if err = s.write(meta); err != nil{
+	if err = s.write(meta); err != nil {
 		return "", err
 	}
 	return edge.ID, nil
@@ -223,42 +216,42 @@ func (s *Store) DeleteTopologyEdge(id string) error {
 	defer s.Unlock()
 
 	meta, err := s.read()
-	if err != nil{
+	if err != nil {
 		return err
 	}
-	if meta == nil || meta.Topology == nil{
+	if meta == nil || meta.Topology == nil {
 		return nil
 	}
 	i := -1
-	for j, edge := range meta.Topology.Edges{
-		if edge.ID == id{
+	for j, edge := range meta.Topology.Edges {
+		if edge.ID == id {
 			i = j
 			break
 		}
 	}
-	if i == -1{
+	if i == -1 {
 		return nil
 	}
 	meta.Topology.Edges = append(meta.Topology.Edges[:i], meta.Topology.Edges[i+1:]...)
 	return s.write(meta)
 }
 
-func (s *Store) read() (*metadata, error){
+func (s *Store) read() (*metadata, error) {
 	data, err := ioutil.ReadFile(s.File)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
-	if len(data) == 0{
+	if len(data) == 0 {
 		return &metadata{}, nil
 	}
 	meta := &metadata{}
-	if err = json.Unmarshal(data, meta);err != nil{
+	if err = json.Unmarshal(data, meta); err != nil {
 		return nil, err
 	}
 	return meta, nil
 }
 
-func (s *Store) write(meta *metadata) error{
+func (s *Store) write(meta *metadata) error {
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return err
