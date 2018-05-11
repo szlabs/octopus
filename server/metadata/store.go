@@ -90,6 +90,29 @@ func (s *Store) DeleteRegistry(id string) error {
 	return s.write(metadata)
 }
 
+func (s *Store) UpdateRegistry(registry *model.Registry) error {
+	s.Lock()
+	defer s.Unlock()
+
+	metadata, err := s.read()
+	if err != nil {
+		return err
+	}
+
+	for _, reg := range metadata.Registries {
+		if reg.ID == registry.ID {
+			reg.Name = registry.Name
+			reg.URL = registry.URL
+			reg.Username = registry.Username
+			reg.Password = registry.Password
+			reg.Insecure = registry.Insecure
+			reg.Status = registry.Status
+			break
+		}
+	}
+	return s.write(metadata)
+}
+
 func (s *Store) GetTopology() (*model.Topology, error) {
 	s.RLock()
 	defer s.RUnlock()

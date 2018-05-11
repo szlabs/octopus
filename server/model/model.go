@@ -9,6 +9,7 @@ type Registry struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Insecure bool   `json:"insecure"`
+	Status   string `json:"status"`
 }
 
 // TODO add validate impl
@@ -57,4 +58,9 @@ type Job struct {
 
 type User struct {
 	Name string
+}
+
+type Project struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }

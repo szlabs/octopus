@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/steven-zou/topological-replication/server/model"
 
@@ -38,35 +39,12 @@ func main() {
 	}
 
 	initSessionStore()
-
 	initResourceManager()
+	handler := initHandler()
 
-	router := mux.NewRouter().StrictSlash(true).PathPrefix("/api/v1").Subrouter()
-	router.NewRoute().Path("/login").Methods(http.MethodPost).
-		HandlerFunc(api.Login)
-	router.NewRoute().Path("/logout").Methods(http.MethodPost).
-		HandlerFunc(api.Logout)
-	router.NewRoute().Path("/registries").Methods(http.MethodGet).
-		HandlerFunc(api.ListRegistry)
-	router.NewRoute().Path("/registries").Methods(http.MethodPost).
-		HandlerFunc(api.CreateRegistry)
-	router.NewRoute().Path("/registries/{id}").Methods(http.MethodDelete).
-		HandlerFunc(api.DeleteRegistry)
-	router.NewRoute().Path("/topology").Methods(http.MethodGet).
-		HandlerFunc(api.GetTopology)
-	router.NewRoute().Path("/topology/nodes").Methods(http.MethodPost).
-		HandlerFunc(api.CreateNode)
-	router.NewRoute().Path("/topology/nodes/{id}").Methods(http.MethodDelete).
-		HandlerFunc(api.DeleteNode)
-	router.NewRoute().Path("/topology/edges").Methods(http.MethodPost).
-		HandlerFunc(api.CreateEdge)
-	router.NewRoute().Path("/topology/edges/{id}").Methods(http.MethodDelete).
-		HandlerFunc(api.DeleteEdge)
-	router.NewRoute().Path("/topology/edges/{id}/status").Methods(http.MethodGet).
-		HandlerFunc(api.GetEdgeStatus)
+	go startRegistryHealthyChecking()
 
-	authHandler := api.NewAuthHandler(router, "/api/v1/login", "/api/v1/logout")
-	handler := handlers.LoggingHandler(os.Stdout, authHandler)
+	log.Printf("server started, listen on :%d ...\n", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), handler))
 }
 
@@ -99,5 +77,47 @@ func initResourceManager() {
 	}
 	core.DefaultTopologyMgr = &core.TopologyManager{
 		MetadataStore: metadata.DefaultStore,
+	}
+}
+
+func initHandler() http.Handler {
+	router := mux.NewRouter().StrictSlash(true).PathPrefix("/api/v1").Subrouter()
+	router.NewRoute().Path("/login").Methods(http.MethodPost).
+		HandlerFunc(api.Login)
+	router.NewRoute().Path("/logout").Methods(http.MethodPost).
+		HandlerFunc(api.Logout)
+	router.NewRoute().Path("/registries").Methods(http.MethodGet).
+		HandlerFunc(api.ListRegistry)
+	router.NewRoute().Path("/registries").Methods(http.MethodPost).
+		HandlerFunc(api.CreateRegistry)
+	router.NewRoute().Path("/registries/{id}").Methods(http.MethodDelete).
+		HandlerFunc(api.DeleteRegistry)
+	router.NewRoute().Path("/registries/{id}/projects").Methods(http.MethodGet).
+		HandlerFunc(api.ListProjects)
+	router.NewRoute().Path("/topology").Methods(http.MethodGet).
+		HandlerFunc(api.GetTopology)
+	router.NewRoute().Path("/topology/nodes").Methods(http.MethodPost).
+		HandlerFunc(api.CreateNode)
+	router.NewRoute().Path("/topology/nodes/{id}").Methods(http.MethodDelete).
+		HandlerFunc(api.DeleteNode)
+	router.NewRoute().Path("/topology/edges").Methods(http.MethodPost).
+		HandlerFunc(api.CreateEdge)
+	router.NewRoute().Path("/topology/edges/{id}").Methods(http.MethodDelete).
+		HandlerFunc(api.DeleteEdge)
+	router.NewRoute().Path("/topology/edges/{id}/status").Methods(http.MethodGet).
+		HandlerFunc(api.GetEdgeStatus)
+
+	authHandler := api.NewAuthHandler(router, "/api/v1/login", "/api/v1/logout")
+	handler := handlers.LoggingHandler(os.Stdout, authHandler)
+	return handler
+}
+
+func startRegistryHealthyChecking() {
+	for {
+		log.Println("registries health checking...")
+		if err := core.DefaultRegMgr.AutoHealthChecking(); err != nil {
+			log.Printf("failed to check health of registries: %v", err)
+		}
+		time.Sleep(5 * time.Second)
 	}
 }

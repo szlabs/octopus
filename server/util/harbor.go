@@ -21,12 +21,18 @@ type Client struct {
 }
 
 func New(url, username, password string, insecure bool) *Client {
-	c := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: insecure,
-			},
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: insecure,
 		},
+	}
+	return NewWithCustomizedTransport(transport, url, username, password)
+}
+
+func NewWithCustomizedTransport(transport *http.Transport, url, username,
+	password string) *Client {
+	c := &http.Client{
+		Transport: transport,
 	}
 	client := common_http.NewClient(c, &basicAuthModifier{
 		username: username,
@@ -97,6 +103,39 @@ func (c *Client) GetJobs(policyID int64) ([]*model.Job, error) {
 	jobs := []*model.Job{}
 	err = c.Get(u.String(), &jobs)
 	return jobs, err
+}
+
+func (c *Client) GetProjects() ([]*model.Project, error) {
+	pros := []struct {
+		ID   int64  `json:"project_id"`
+		Name string `json:"name"`
+	}{}
+	if err := c.Get(c.url+"/api/projects", &pros); err != nil {
+		return nil, err
+	}
+	projects := []*model.Project{}
+	for _, pro := range pros {
+		projects = append(projects, &model.Project{
+			ID:   pro.ID,
+			Name: pro.Name,
+		})
+	}
+	return projects, nil
+}
+
+func (c *Client) Ping(url, username, password string, insecure bool) error {
+	target := struct {
+		URL      string `json:"endpoint"`
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Insecure bool   `json:"insecure"`
+	}{
+		URL:      url,
+		Username: username,
+		Password: password,
+		Insecure: insecure,
+	}
+	return c.Post(c.url+"/api/targets/ping", &target)
 }
 
 func (c *Client) post(path string, v interface{}) (int64, error) {
