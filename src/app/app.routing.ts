@@ -14,15 +14,19 @@ import { ShellComponent } from './shell/shell.component';
 import { AuthGuard } from './guard/auth.guard';
 import { ServerFormComponent } from './server-form/server-form.component';
 import { TopologyBuilderComponent } from './topology-builder/topology-builder.component';
-
+import { LoggedGuardGuard } from './guard/logged-guard.guard';
 
 export const ROUTES: Routes = [
     {path: '', redirectTo: 'harbor', pathMatch: 'full'},
-    {path: 'login', component: LoginComponent},
+    {
+      path: 'login', 
+      component: LoginComponent,
+      canActivate: [LoggedGuardGuard]
+    },
     {
     	path: 'harbor', 
     	component: ShellComponent,
-    	//canActivateChild: [AuthGuard],
+    	canActivateChild: [AuthGuard],
     	children:[
     	  {path: '', redirectTo: 'registries', pathMatch: 'full'},
     	  {

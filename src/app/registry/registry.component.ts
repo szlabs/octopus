@@ -4,6 +4,9 @@ import { RegistryStatus } from '../interface/registry-status.enum';
 import { RegistryKind } from '../interface/registry-kind.enum';
 import { Router } from '@angular/router';
 import { ROUTES } from '../consts';
+import { PubSubService } from '../service/pub-sub.service';
+import { EVENT_ALERT, EVENT_REGISTRY_LIST_UPDATED, ALERT_DANGER, ALERT_SUCCESS } from '../utils';
+import { RegistryManagementService } from '../service/registry-management.service';
 
 @Component({
   selector: 'app-registry',
@@ -11,42 +14,55 @@ import { ROUTES } from '../consts';
   styleUrls: ['./registry.component.scss']
 })
 export class RegistryComponent implements OnInit {
-  
+
   registries: RegistryServer[] = [];
 
   constructor(
-    private router: Router
-    ) { }
+    private router: Router,
+    private pubSub: PubSubService,
+    private registryService: RegistryManagementService
+  ) { 
+    this.pubSub.on(EVENT_REGISTRY_LIST_UPDATED).subscribe(() => {
+      this.refresh();
+    });
+  }
+
+  private refresh():void {
+    this.registryService.getRegistries()
+      .then((registries: RegistryServer[]) => {
+        if (registries && registries.length > 0) {
+          this.registries = registries;
+        }
+        this.pubSub.publish(EVENT_ALERT, {
+          alertType: ALERT_SUCCESS,
+          data: this.registries.length + " registry servers are loaded"
+        });
+      })
+      .catch(error => {
+        this.pubSub.publish(EVENT_ALERT, {
+          alertType: ALERT_DANGER,
+          data: '' + error
+        });
+      });
+  }
 
   ngOnInit() {
-  	//mock some data
-  	for (let i = 9; i >= 0; i--) {
-  		let id: number = 10000+i;
-  		let serv: RegistryServer = {
-  			ID: "srv"+id,
-  	        name: "harbor@beijing"+i,
-  	        address: "https://10.112.122.122/harbor",
-		  	status: RegistryStatus.HEALTHY,
-		  	createTime: new Date(),
-		  	kind: RegistryKind.HARBOR
-  		};
-  		this.registries.push(serv)
-  	}
+    this.refresh();
   }
 
   editServer(server: RegistryServer): void {
-    this.router.navigateByUrl(ROUTES.EDIT_REGISTRY+"/"+server.ID)
+    this.router.navigateByUrl(ROUTES.EDIT_REGISTRY + "/" + server.id)
   }
 
   deleteServer(server: RegistryServer): void {
-  	console.debug("delete", server);
+    console.debug("delete", server);
   }
 
   pingServer(server: RegistryServer): void {
-  	console.debug("ping", server);
+    console.debug("ping", server);
   }
 
-  addServer(){
+  addServer() {
     this.router.navigateByUrl(ROUTES.ADD_REGISTRY)
   }
 

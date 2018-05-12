@@ -2,10 +2,14 @@ import { RegistryKind } from './registry-kind.enum';
 import { RegistryStatus } from './registry-status.enum';
 
 export interface RegistryServer {
-	ID: string;
+	id?: string;
 	name: string;
-	address: string;
+	url: string;
+	username?: string;
+	password?: string;
 	status: RegistryStatus;
-	createTime: Date;
+	create_time?: Date;
+	update_time?: Date;
 	kind: RegistryKind;
+	insecure: boolean;
 }

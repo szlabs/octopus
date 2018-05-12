@@ -17,6 +17,10 @@ import { RegistryServerComponent } from './registry-server/registry-server.compo
 import { ServerFormComponent } from './server-form/server-form.component';
 import { TopologyBuilderComponent } from './topology-builder/topology-builder.component';
 import { VisModule } from 'ng2-vis';
+import { LoggedGuardGuard } from './guard/logged-guard.guard';
+import { PubSubService } from './service/pub-sub.service';
+import { RegistryManagementService } from './service/registry-management.service';
+import { PolicyBuilderService } from './service/policy-builder.service';
 
 @NgModule({
     declarations: [
@@ -41,7 +45,11 @@ import { VisModule } from 'ng2-vis';
     ],
     providers: [
         AuthService,
-        AuthGuard
+        AuthGuard,
+        LoggedGuardGuard,
+        PubSubService,
+        RegistryManagementService,
+        PolicyBuilderService
     ],
     bootstrap: [AppComponent]
 })

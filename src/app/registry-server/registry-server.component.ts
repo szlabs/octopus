@@ -33,8 +33,8 @@ export class RegistryServerComponent implements OnInit {
   }
 
   public get createTime(): string {
-  	if (this.data && this.data.createTime){
-  		return this.data.createTime.toLocaleString();
+  	if (this.data && this.data.create_time){
+  		return this.data.create_time.toLocaleString();
   	}
 
   	return "n/a";

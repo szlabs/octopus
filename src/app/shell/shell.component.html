@@ -1,48 +1,48 @@
 <clr-main-container>
-  <clr-header class="header header-5">
-    <div class="branding">
-      <a href="/harbor" class="nav-link">
-        <span class="clr-icon clr-clarity-logo"></span>
-        <span class="title">Topological Replication</span>
-      </a>
-    </div>
-    <div class="header-actions">
-      <a href="javascript:void(0);" class="nav-link nav-text logged-usr">Administrator</a>
-      <clr-dropdown>
-            <button class="nav-icon" clrDropdownTrigger>
-                <clr-icon shape="user"></clr-icon>
-                <clr-icon shape="caret down"></clr-icon>
-            </button>
-            <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
-                <a href="javascript:void(0);" clrDropdownItem (click)="about()">About</a>
-                <a href="javascript:void(0);" clrDropdownItem (click)="logOut()">Log out</a>
-            </clr-dropdown-menu>
-        </clr-dropdown>
-    </div>
-  </clr-header>
-  <div class="content-container">
-    <div class="content-area">
-      <clr-alert [clrAlertType]="'alert-success'">
-        <div class="alert-item">
-          <span class="alert-text">
-            This alert indicates success.
-          </span>
+    <clr-header class="header header-5">
+        <div class="branding">
+            <a href="/harbor" class="nav-link">
+                <span class="clr-icon clr-clarity-logo"></span>
+                <span class="title">Topological Replication</span>
+            </a>
         </div>
-      </clr-alert>
-      <router-outlet></router-outlet>
+        <div class="header-actions">
+            <a href="javascript:void(0);" class="nav-link nav-text logged-usr">{{user}}</a>
+            <clr-dropdown>
+                <button class="nav-icon" clrDropdownTrigger>
+                    <clr-icon shape="user"></clr-icon>
+                    <clr-icon shape="caret down"></clr-icon>
+                </button>
+                <clr-dropdown-menu *clrIfOpen clrPosition="bottom-right">
+                    <a href="javascript:void(0);" clrDropdownItem (click)="about()">About</a>
+                    <a href="javascript:void(0);" clrDropdownItem (click)="logOut()">Log out</a>
+                </clr-dropdown-menu>
+            </clr-dropdown>
+        </div>
+    </clr-header>
+    <div class="content-container">
+        <div class="content-area">
+            <clr-alert [clrAlertType]="alertType" [(clrAlertClosed)]="closed">
+                <div class="alert-item">
+                    <span class="alert-text">
+                        {{alertMessage}}
+                    </span>
+                </div>
+            </clr-alert>
+            <router-outlet></router-outlet>
+        </div>
+        <clr-vertical-nav [clrVerticalNavCollapsible]="true">
+            <a clrVerticalNavLink routerLink="./registries" routerLinkActive="active">
+                <clr-icon clrVerticalNavIcon shape="layers"></clr-icon>
+                Registries
+            </a>
+            <a clrVerticalNavLink routerLink="./policies" routerLinkActive="active">
+                <clr-icon clrVerticalNavIcon shape="organization"></clr-icon>
+                Policies
+            </a>
+        </clr-vertical-nav>
     </div>
-    <clr-vertical-nav [clrVerticalNavCollapsible]="true">
-    <a clrVerticalNavLink routerLink="./registries" routerLinkActive="active">
-        <clr-icon clrVerticalNavIcon shape="layers"></clr-icon>
-        Registries
-    </a>
-    <a clrVerticalNavLink routerLink="./policies" routerLinkActive="active">
-        <clr-icon clrVerticalNavIcon shape="organization"></clr-icon>
-        Policies
-    </a>
-</clr-vertical-nav>
-  </div>
-  <div>
-  	<about-dialog></about-dialog>
-  </div>
+    <div>
+        <about-dialog></about-dialog>
+    </div>
 </clr-main-container>

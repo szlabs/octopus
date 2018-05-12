@@ -1,16 +1,16 @@
 <div class="card">
     <div class="card-header">
-        {{data.ID}}:{{data.name}}
+        {{data.id}}:{{data.name}}
     </div>
     <div class="card-block">
-    	<div class="progress top" [ngClass]="progressClass">
+        <div class="progress top" [ngClass]="progressClass">
             <progress value="100" max="100"></progress>
         </div>
         <div class="card-media-block">
             <img [attr.src]="imgSrc" class="card-media-image">
             <div class="card-media-description">
                 <span class="card-media-title">
-                    Address: {{data.address}}
+                    Address: {{data.url}}
                 </span>
                 <span class="card-media-text">
                     Status: {{data.status}}

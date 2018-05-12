@@ -14,8 +14,8 @@ export class AuthGuard implements CanActivate, CanActivateChild {
 
 	canActivate(next: ActivatedRouteSnapshot,state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
 		if (this.authService.getCurrentUser() == null) {
-			console.info("null session")
-			this.router.navigateByUrl(ROUTES.LOGIN)
+			console.info("null session");
+			this.router.navigateByUrl(ROUTES.LOGIN);
 			return Promise.resolve(false);
 		}
 
