@@ -1,0 +1,10 @@
+<clr-modal [(clrModalOpen)]="opened" [clrModalStaticBackdrop]="true" [clrModalClosable]="false">
+    <h3 class="modal-title">{{modalTitle}}</h3>
+    <div class="modal-body">
+        <p>{{message}}</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline" (click)="opened = false">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="doOk()">Ok</button>
+    </div>
+</clr-modal>

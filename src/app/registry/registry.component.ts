@@ -16,33 +16,36 @@ import { RegistryManagementService } from '../service/registry-management.servic
 export class RegistryComponent implements OnInit {
 
   registries: RegistryServer[] = [];
+  private onGoing: boolean = false;
 
   constructor(
     private router: Router,
     private pubSub: PubSubService,
     private registryService: RegistryManagementService
-  ) { 
+  ) {
     this.pubSub.on(EVENT_REGISTRY_LIST_UPDATED).subscribe(() => {
       this.refresh();
     });
   }
 
-  private refresh():void {
+  private refresh(): void {
+    if (this.onGoing) {
+      return;
+    }
+
+    this.onGoing = true;
+
     this.registryService.getRegistries()
       .then((registries: RegistryServer[]) => {
-        if (registries && registries.length > 0) {
+        this.onGoing = false;
+        if (registries) {
           this.registries = registries;
         }
-        this.pubSub.publish(EVENT_ALERT, {
-          alertType: ALERT_SUCCESS,
-          data: this.registries.length + " registry servers are loaded"
-        });
+        this.showSuccess(this.registries.length + " registry servers are loaded");
       })
       .catch(error => {
-        this.pubSub.publish(EVENT_ALERT, {
-          alertType: ALERT_DANGER,
-          data: '' + error
-        });
+        this.onGoing = false;
+        this.showError('' + error);
       });
   }
 
@@ -55,7 +58,23 @@ export class RegistryComponent implements OnInit {
   }
 
   deleteServer(server: RegistryServer): void {
-    console.debug("delete", server);
+    if (this.onGoing) {
+      return;
+    }
+    if (server && server.id) {
+      this.onGoing = true;
+      this.registryService.deleteRegistryServer(server.id)
+        .then(() => {
+          this.onGoing = false;
+          let msg: string = "Registry server '" + server.name + "(" + server.id + ")' is successfully deleted";
+          this.showSuccess(msg);
+          this.refresh();
+        })
+        .catch(error => {
+          this.showError(error);
+          this.onGoing = false;
+        })
+    }
   }
 
   pingServer(server: RegistryServer): void {
@@ -64,6 +83,26 @@ export class RegistryComponent implements OnInit {
 
   addServer() {
     this.router.navigateByUrl(ROUTES.ADD_REGISTRY)
+  }
+
+  private showError(error: string): void {
+    if (!error) {
+      return;
+    }
+    this.pubSub.publish(EVENT_ALERT, {
+      alertType: ALERT_DANGER,
+      data: error
+    });
+  }
+
+  private showSuccess(message: string): void {
+    if (!message) {
+      return;
+    }
+    this.pubSub.publish(EVENT_ALERT, {
+      alertType: ALERT_SUCCESS,
+      data: message
+    });
   }
 
 }

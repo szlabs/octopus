@@ -60,7 +60,7 @@
                     <div class="form-group">
                         <label for="regType">Registry Type</label>
                         <div class="select">
-                            <select id="regType" name="registryType" [(ngModel)]="model.kind" class="input-box">
+                            <select id="regType" name="registryType" [(ngModel)]="model.kind" class="input-box" [disabled]="isEditMode">
                                 <option value="Unknown" selected>Select Registry Kind...</option>
                                 <option *ngFor="let kind of allKinds" [value]="kind">{{kind}}</option>
                             </select>

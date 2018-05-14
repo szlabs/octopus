@@ -27,7 +27,13 @@ export class ShellComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private pubSub: PubSubService
-  ) { }
+  ) { 
+    this.pubSub.on(EVENT_ALERT).subscribe((message: any) => {
+      if (message.alertType) {
+        this.showMessage(message.alertType, message.data);
+      }
+    });
+  }
 
   public get user(): string {
     if (this.loggedUser) {
@@ -38,11 +44,6 @@ export class ShellComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.pubSub.on(EVENT_ALERT).subscribe((message: any) => {
-      if (message.alertType) {
-        this.showMessage(message.alertType, message.data);
-      }
-    });
     this.loggedUser = this.authService.getCurrentUser();
   }
 

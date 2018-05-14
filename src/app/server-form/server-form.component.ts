@@ -23,7 +23,7 @@ export class ServerFormComponent implements OnInit {
   private closed: boolean = true;
   private alertMessage: string = "";
   private alertTicker: any = null;
-  private onGoing:boolean = false;
+  private onGoing: boolean = false;
 
   title: string = "Add";
   submitted: boolean = false;
@@ -47,6 +47,15 @@ export class ServerFormComponent implements OnInit {
     let serverId = this.route.snapshot.params['id'];
     if (serverId) {
       this.title = "Edit";
+      this.registryService.getRegistryServer(serverId)
+      .then((registryServer: RegistryServer) => {
+        this.onGoing = false
+        this.model = registryServer;
+      })
+      .catch(error => {
+        this.onGoing = false;
+        this.showError(error);
+      });
     }
   }
 
@@ -55,24 +64,17 @@ export class ServerFormComponent implements OnInit {
       return;
     }
 
-    if (this.model.kind === RegistryKind.UNKNOWN){
+    if (this.model.kind === RegistryKind.UNKNOWN) {
       this.model.kind = RegistryKind.HARBOR;
     }
 
-    this.registryService.createRegistryServer(this.model)
-    .then((response:any) => {
-      this.pubSub.publish(EVENT_ALERT, {
-        alertType: ALERT_SUCCESS,
-        data: "Registry server " + this.model.name + "(" + response.id + ") is successfully added"
-      });
-      this.router.navigateByUrl(ROUTES.HOME);
-      this.pubSub.publish(EVENT_REGISTRY_LIST_UPDATED, {});
-    })
-    .catch(error => {
-      this.onGoing = false;
-      this.showError(error);
-    });
+    this.onGoing = true;
 
+    if (this.isEditMode) {
+      this.updateRegistry();
+    } else {
+      this.addRegistry();
+    }
   }
 
   cancel() {
@@ -89,6 +91,41 @@ export class ServerFormComponent implements OnInit {
     }
 
     return "OFF";
+  }
+
+  private addRegistry(): void {
+    this.registryService.createRegistryServer(this.model)
+      .then((response: any) => {
+        this.onGoing = false;
+        this.showSuccess("Registry server " + this.model.name + "(" + response.id + ") is successfully added");
+        this.router.navigateByUrl(ROUTES.HOME);
+        this.pubSub.publish(EVENT_REGISTRY_LIST_UPDATED, {});
+      })
+      .catch(error => {
+        this.onGoing = false;
+        this.showError(error);
+      });
+  }
+
+  private updateRegistry(): void {
+    this.registryService.updateRegistryServer(this.model)
+      .then(() => {
+        this.onGoing = false;
+        this.showSuccess("Registry server " + this.model.name + "(" + this.model.id + ") is successfully updated");
+        this.router.navigateByUrl(ROUTES.HOME);
+        this.pubSub.publish(EVENT_REGISTRY_LIST_UPDATED, {});
+      })
+      .catch(error => {
+        this.onGoing = false;
+        this.showError(error);
+      })
+  }
+
+  private showSuccess(message: string): void {
+    this.pubSub.publish(EVENT_ALERT, {
+      alertType: ALERT_SUCCESS,
+      data: message
+    });
   }
 
   private showError(error: string): void {

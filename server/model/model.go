@@ -3,13 +3,16 @@ package model
 import "time"
 
 type Registry struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	URL      string `json:"url"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Insecure bool   `json:"insecure"`
-	Status   string `json:"status"`
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	URL        string `json:"url"`
+	Username   string `json:"username"`
+	Password   string `json:"password"`
+	Insecure   bool   `json:"insecure"`
+	Status     string `json:"status"`
+	Kind       string `json:"kind"`
+	CreateTime int64  `json:"create_time"`
+	UpdateTime int64  `json:"update_time"`
 }
 
 // TODO add validate impl

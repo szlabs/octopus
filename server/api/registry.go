@@ -10,6 +10,21 @@ import (
 	"github.com/steven-zou/topological-replication/server/util"
 )
 
+func GetRegistry(rw http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	registry, err := core.DefaultRegMgr.Get(id)
+	if err != nil {
+		handleNotFound(rw)
+		return
+	}
+
+	if err := writeJSON(rw, registry); err != nil {
+		handleInternalServerError(rw, err)
+		return
+	}
+
+}
+
 func ListRegistry(rw http.ResponseWriter, r *http.Request) {
 	registries, err := core.DefaultRegMgr.List()
 	if err != nil {
@@ -35,6 +50,25 @@ func CreateRegistry(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err = writeJSON(rw, map[string]string{"id": id}); err != nil {
+		handleInternalServerError(rw, err)
+		return
+	}
+}
+
+func UpdateRegistry(rw http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	if _, err := core.DefaultRegMgr.Get(id); err != nil {
+		handleNotFound(rw)
+		return
+	}
+
+	registry := &model.Registry{}
+	if err := readJSON(r, registry); err != nil {
+		log.Printf("%v \n", err)
+		handleBadRequest(rw)
+		return
+	}
+	if err := core.DefaultRegMgr.Update(registry); err != nil {
 		handleInternalServerError(rw, err)
 		return
 	}

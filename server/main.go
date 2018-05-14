@@ -92,6 +92,10 @@ func initHandler() http.Handler {
 		HandlerFunc(api.CreateRegistry)
 	router.NewRoute().Path("/registries/{id}").Methods(http.MethodDelete).
 		HandlerFunc(api.DeleteRegistry)
+	router.NewRoute().Path("/registries/{id}").Methods(http.MethodPut).
+		HandlerFunc(api.UpdateRegistry)
+	router.NewRoute().Path("/registries/{id}").Methods(http.MethodGet).
+		HandlerFunc(api.GetRegistry)
 	router.NewRoute().Path("/registries/{id}/projects").Methods(http.MethodGet).
 		HandlerFunc(api.ListProjects)
 	router.NewRoute().Path("/topology").Methods(http.MethodGet).

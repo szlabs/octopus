@@ -9,5 +9,7 @@ export function Guid() {
 
 export const EVENT_ALERT = "alert-message";
 export const EVENT_REGISTRY_LIST_UPDATED = "registry-list-updated";
+export const EVENT_OPEN_MODAL = "open-modal";
+export const EVENT_MODAL_CONFIRM = "modal_confirm";
 export const ALERT_SUCCESS = "alert-success";
 export const ALERT_DANGER = "alert-danger";

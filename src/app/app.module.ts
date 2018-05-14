@@ -21,6 +21,7 @@ import { LoggedGuardGuard } from './guard/logged-guard.guard';
 import { PubSubService } from './service/pub-sub.service';
 import { RegistryManagementService } from './service/registry-management.service';
 import { PolicyBuilderService } from './service/policy-builder.service';
+import { ConfirmationModalComponent } from './confirmation-modal/confirmation-modal.component';
 
 @NgModule({
     declarations: [
@@ -32,7 +33,8 @@ import { PolicyBuilderService } from './service/policy-builder.service';
         ShellComponent,
         RegistryServerComponent,
         ServerFormComponent,
-        TopologyBuilderComponent
+        TopologyBuilderComponent,
+        ConfirmationModalComponent
     ],
     imports: [
         BrowserAnimationsModule,

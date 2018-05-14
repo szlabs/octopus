@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        {{data.id}}:{{data.name}}
+        <span class="server-title">{{data.name}}</span>:{{data.id}}
     </div>
     <div class="card-block">
         <div class="progress top" [ngClass]="progressClass">
@@ -18,18 +18,19 @@
             </div>
         </div>
         <div class="card-text card-body">
-            Create Time: {{createTime}}
+            <div>Create Time: {{createTime}}</div>
+            <div>Update Time: {{updateTime}}</div>
         </div>
     </div>
     <div class="card-footer">
         <button type="button" class="btn btn-icon btn-link" title="edit server" (click)="edit()">
-        	<clr-icon shape="pencil"></clr-icon>
+            <clr-icon shape="pencil"></clr-icon>
         </button>
         <button type="button" class="btn btn-icon btn-link" title="ping server" (click)="ping()">
-        	<clr-icon shape="bolt"></clr-icon>
+            <clr-icon shape="bolt"></clr-icon>
         </button>
-        <button type="button" class="btn btn-icon btn-danger" title="delete server" (click)="delete()">
-        	<clr-icon shape="trash"></clr-icon>
+        <button type="button" class="btn btn-icon btn-danger" title="delete server" (click)="confirmDeletion()">
+            <clr-icon shape="trash"></clr-icon>
         </button>
     </div>
 </div>

@@ -8,8 +8,8 @@ export interface RegistryServer {
 	username?: string;
 	password?: string;
 	status: RegistryStatus;
-	create_time?: Date;
-	update_time?: Date;
+	create_time?: number;
+	update_time?: number;
 	kind: RegistryKind;
 	insecure: boolean;
 }

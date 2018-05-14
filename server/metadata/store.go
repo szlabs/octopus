@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"sync"
+	"time"
 
 	uuid "github.com/satori/go.uuid"
 	"github.com/steven-zou/topological-replication/server/model"
@@ -60,6 +61,8 @@ func (s *Store) AddRegistry(registry *model.Registry) (string, error) {
 	}
 
 	registry.ID = uuid.NewV4().String()
+	registry.CreateTime = time.Now().Unix()
+	registry.UpdateTime = registry.CreateTime
 	metadata.Registries = append(metadata.Registries, registry)
 	if err = s.write(metadata); err != nil {
 		return "", err
@@ -107,6 +110,7 @@ func (s *Store) UpdateRegistry(registry *model.Registry) error {
 			reg.Password = registry.Password
 			reg.Insecure = registry.Insecure
 			reg.Status = registry.Status
+			reg.UpdateTime = time.Now().Unix()
 			break
 		}
 	}

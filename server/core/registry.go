@@ -48,6 +48,10 @@ func (r *RegistryManager) Create(registry *model.Registry) (string, error) {
 	return r.MetadataStore.AddRegistry(registry)
 }
 
+func (r *RegistryManager) Update(registry *model.Registry) error {
+	return r.MetadataStore.UpdateRegistry(registry)
+}
+
 func (r *RegistryManager) Delete(id string) error {
 	exist, err := r.Exist(id)
 	if err != nil {

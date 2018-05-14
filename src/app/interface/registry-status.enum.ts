@@ -1,6 +1,6 @@
 export enum RegistryStatus {
-	HEALTHY = "Healthy",
-	UNAVAILABLE = "Unavailable",
-	NEW = "New",
-	UNKNOWN = "Unknown"
+	HEALTHY = "healthy",
+	UNAVAILABLE = "unavailable",
+	NEW = "new",
+	UNKNOWN = "unknown"
 }
