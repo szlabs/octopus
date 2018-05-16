@@ -1,16 +1,37 @@
+<h3>Build replication topological policy
+    <span class="spinner spinner-inline spinner-md" [hidden]="!onGoing">
+				Loading...
+		</span>
+</h3>
 <div class="row">
-	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-2 col-xl-2">
-		<div>
-		  <button type="button" class="btn btn-icon" (click)="onAdd()">
-		  	<clr-icon shape="home"></clr-icon>ADD
-		  </button>
-		</div>
-	</div>
-	<div class="col-xs-8 col-sm-8 col-md-8 col-lg-10 col-xl-10">
-		<div class="network-canvas"
-        [visNetwork]="visNetwork"
-        [visNetworkData]="visNetworkData"
-        [visNetworkOptions]="visNetworkOptions"
-        (initialized)="networkInitialized()"></div>
-	</div>
+    <div class="col-xs-11 col-sm-11 col-md-11 col-lg-11 col-xl-11"></div>
+    <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xl-1">
+        <button class="btn btn-primary" type="button" (click)="refresh()"><clr-icon shape="refresh"></clr-icon>Refresh</button>
+    </div>
+</div>
+<div class="row" style="margin-top: 25px;">
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-2 col-xl-2">
+        <div>
+            Registry Servers
+        </div>
+        <div>
+            <div *ngFor="let c of candidates" class="card" [class.clickable]="getNodeMode(c) === 1" (click)="onAdd(c)">
+                <div class="card-block">
+                    <div class="progress top" [class.success]="c.server.status === 'healthy'" [class.danger]="c.server.status !== 'healthy'">
+                        <progress value="100" max="100"></progress>
+                    </div>
+                    <h4 class="card-title server-title" [ngSwitch]="getNodeMode(c)">
+                        <clr-icon *ngSwitchCase="0" shape="error-standard" class="is-solid red-icon"></clr-icon>
+                        <clr-icon *ngSwitchCase="1" shape="plus-circle" class="green-icon"></clr-icon>
+                        <clr-icon *ngSwitchCase="2" shape="success-standard" class="is-solid green-icon"></clr-icon>
+                        {{c.server.name}}</h4>
+                    <p class="card-text">ID: {{c.server.id}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-10 col-xl-10">
+        <div id="policy_topology_canvas" class="network-canvas"></div>
+    </div>
+    <router-outlet></router-outlet>
 </div>

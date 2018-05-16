@@ -13,7 +13,7 @@
             <form #serverForm="ngForm" (ngSubmit)="onSubmit()" [hidden]="submitted" class="compact">
                 <section class="form-block">
                     <label>{{title}} Registry Server Information</label>
-                    <div class="form-group" *ngIf="isEditMode">
+                    <div class="form-group" *ngIf="isEditMode || isViewMode">
                         <label for="serverID" class="required">Server ID</label>
                         <input type="text" id="serverID" placeholder="srv_random" disabled name="serverID" [(ngModel)]="model.id" #serverID="ngModel" class="input-box">
                     </div>
@@ -21,7 +21,7 @@
                         <label for="serverName" class="required">Server Name</label>
                         <label for="serverName" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-left" [class.invalid]="serverNameInput.invalid && (serverNameInput.dirty || serverNameInput.touched)">
                             <input type="text" id="serverName" placeholder="Enter registry server name" required name="serverName" [(ngModel)]="model.name"
-                                #serverNameInput="ngModel" class="input-box">
+                                #serverNameInput="ngModel" class="input-box" [disabled]="isViewMode">
                             <span class="tooltip-content">
                                 Server Name is Required.
                             </span>
@@ -31,7 +31,7 @@
                         <label for="serverAddr" class="required">Server Address</label>
                         <label for="serverAddr" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-left" [class.invalid]="serverAddrInput.invalid && (serverAddrInput.dirty || serverAddrInput.touched)">
                             <input type="text" id="serverAddr" placeholder="Enter registry address" required name="serverAddr" [(ngModel)]="model.url"
-                                #serverAddrInput="ngModel" class="input-box">
+                                #serverAddrInput="ngModel" class="input-box" [disabled]="isViewMode">
                             <span class="tooltip-content">
                                 Server Address is Required.
                             </span>
@@ -41,7 +41,7 @@
                         <label for="userName" class="required">Username</label>
                         <label for="userName" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-left" [class.invalid]="userNameInput.invalid && (userNameInput.dirty || userNameInput.touched)">
                             <input type="text" id="userName" placeholder="Enter username of the registry" required name="userName" [(ngModel)]="model.username"
-                                #userNameInput="ngModel" class="input-box">
+                                #userNameInput="ngModel" class="input-box" [disabled]="isViewMode">
                             <span class="tooltip-content">
                                 Username is Required.
                             </span>
@@ -51,7 +51,7 @@
                         <label for="password" class="required">Password</label>
                         <label for="password" aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-top-left" [class.invalid]="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)">
                             <input type="password" id="password" placeholder="Enter password of the registry" required name="password" [(ngModel)]="model.password"
-                                #passwordInput="ngModel" class="input-box">
+                                #passwordInput="ngModel" class="input-box" [disabled]="isViewMode">
                             <span class="tooltip-content">
                                 Password is Required.
                             </span>
@@ -60,7 +60,7 @@
                     <div class="form-group">
                         <label for="regType">Registry Type</label>
                         <div class="select">
-                            <select id="regType" name="registryType" [(ngModel)]="model.kind" class="input-box" [disabled]="isEditMode">
+                            <select id="regType" name="registryType" [(ngModel)]="model.kind" class="input-box" [disabled]="isEditMode || isViewMode">
                                 <option value="Unknown" selected>Select Registry Kind...</option>
                                 <option *ngFor="let kind of allKinds" [value]="kind">{{kind}}</option>
                             </select>
@@ -69,11 +69,11 @@
                     <div class="form-group">
                         <label>Insecure</label>
                         <div class="toggle-switch">
-                            <input type="checkbox" id="insecure" name="insecure" #insecureCheck="ngModel" [(ngModel)]="model.insecure">
+                            <input type="checkbox" id="insecure" name="insecure" #insecureCheck="ngModel" [(ngModel)]="model.insecure" [disabled]="isViewMode">
                             <label for="insecure">{{toggleText}}</label>
                         </div>
                     </div>
-                    <button class="btn btn-primary" type="submit" [disabled]="serverForm.form.invalid">Add</button>
+                    <button class="btn btn-primary" type="submit" [disabled]="serverForm.form.invalid" [hidden]="isViewMode">Add</button>
                     <button class="btn btn-outline" type="button" (click)="cancel()">Cancel</button>
                 </section>
             </form>

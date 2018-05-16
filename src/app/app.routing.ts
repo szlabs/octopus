@@ -15,6 +15,8 @@ import { AuthGuard } from './guard/auth.guard';
 import { ServerFormComponent } from './server-form/server-form.component';
 import { TopologyBuilderComponent } from './topology-builder/topology-builder.component';
 import { LoggedGuardGuard } from './guard/logged-guard.guard';
+import { ReplicationStatisticsComponent } from './replication-statistics/replication-statistics.component';
+import { ReplicationRuleComponent } from './replication-rule/replication-rule.component';
 
 export const ROUTES: Routes = [
     {path: '', redirectTo: 'harbor', pathMatch: 'full'},
@@ -41,8 +43,16 @@ export const ROUTES: Routes = [
               path: 'policies', 
               component: PolicyComponent,
               children: [
-                {path: 'build', component: TopologyBuilderComponent},
-                {path: 'edit/:id', component: TopologyBuilderComponent},
+                {path: '', redirectTo: 'build', pathMatch: 'full'},
+                {
+                  path: 'build', 
+                  component: TopologyBuilderComponent,
+                  children: [
+                    {path: 'node/:id', component: ServerFormComponent},
+                    {path: 'stats/:id', component: ReplicationStatisticsComponent},
+                    {path: 'edge/:id', component: ReplicationRuleComponent},
+                  ]
+                },
               ]
           }
     	]

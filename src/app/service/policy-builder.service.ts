@@ -1,8 +1,45 @@
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+import { Topology } from '../interface/topology';
+import { HTTP_JSON_OPTIONS } from './options';
+import { RegistryServer } from '../interface/registry-server';
+import { Project } from '../interface/replication';
+import { EdgeRequest } from '../interface/replication';
+
+const TOPOLOGY_URL = "/api/v1/topology";
+const TOPOLOGY_NODES_URL = "/api/v1/topology/nodes";
+const PROJECT_LIST = "/api/v1/registries/{id}/projects";
+const TOPOLOGY_EDGES_URL = "/api/v1/topology/edges";
 
 @Injectable()
 export class PolicyBuilderService {
 
-  constructor() { }
+  constructor(
+    private http: Http
+  ) { }
+
+  public getTopology(): Promise<Topology> {
+    return this.http.get(TOPOLOGY_URL, HTTP_JSON_OPTIONS).toPromise()
+    .then(response => response.json() as Topology)
+    .catch(error => Promise.reject(error));
+  }
+
+  public addNode(registry: RegistryServer): Promise<any> {
+    return this.http.post(TOPOLOGY_NODES_URL, JSON.stringify(registry), HTTP_JSON_OPTIONS).toPromise()
+    .then(() => Promise.resolve(true))
+    .catch(error => Promise.reject(error));
+  }
+
+  public getProjectList(id: string): Promise<Project[]> {
+    return this.http.get(PROJECT_LIST.replace("{id}", id), HTTP_JSON_OPTIONS).toPromise()
+    .then(response => response.json() as Project[])
+    .catch(error => Promise.reject(error));
+  }
+
+  public addEdge(edgeReq: EdgeRequest): Promise<any> {
+    return this.http.post(TOPOLOGY_EDGES_URL, JSON.stringify(edgeReq), HTTP_JSON_OPTIONS).toPromise()
+    .then(response => Promise.resolve(response.json()))
+    .catch(error => Promise.reject(error));
+  }
 
 }

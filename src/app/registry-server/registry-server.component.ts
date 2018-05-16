@@ -1,10 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { RegistryServer } from '../interface/registry-server';
 import { RegistryKind } from '../interface/registry-kind.enum';
 import { RegistryStatus } from '../interface/registry-status.enum';
 import { FadeInAnimation } from '../_animations/index';
 import { PubSubService } from '../service/pub-sub.service';
 import { EVENT_MODAL_CONFIRM, EVENT_OPEN_MODAL } from '../utils';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-registry-server',
@@ -13,7 +14,7 @@ import { EVENT_MODAL_CONFIRM, EVENT_OPEN_MODAL } from '../utils';
   animations: [FadeInAnimation],
   host: { '[@FadeInAnimation]': '' }
 })
-export class RegistryServerComponent implements OnInit {
+export class RegistryServerComponent implements OnInit, OnDestroy {
 
   @Input() data: RegistryServer;
   onGoing: boolean = false;
@@ -21,10 +22,12 @@ export class RegistryServerComponent implements OnInit {
   @Output() deleteServer: EventEmitter<RegistryServer> = new EventEmitter<RegistryServer>();
   @Output() pingServer: EventEmitter<RegistryServer> = new EventEmitter<RegistryServer>();
 
+  private subscription: Subscription;
+
   constructor(
     private pubSub: PubSubService
   ) {
-    this.pubSub.on(EVENT_MODAL_CONFIRM).subscribe(data => {
+    this.subscription = this.pubSub.on(EVENT_MODAL_CONFIRM).subscribe(data => {
       if (data && data.id && data.id === this.data.id) {
         this.delete();
       }
@@ -32,6 +35,10 @@ export class RegistryServerComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+  
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   public get imgSrc(): string {

@@ -10,6 +10,10 @@ import { RegistryManagementService } from '../service/registry-management.servic
 import { PubSubService } from '../service/pub-sub.service';
 import { ALERT_SUCCESS, EVENT_ALERT, EVENT_REGISTRY_LIST_UPDATED } from '../utils';
 
+const MODE_NEW: string = "NEW";
+const MODE_EDIT: string = "EDIT";
+const MODE_VIEW: string = "VIEW";
+
 @Component({
   moduleId: module.id.toString(),
   selector: 'app-server-form',
@@ -24,6 +28,7 @@ export class ServerFormComponent implements OnInit {
   private alertMessage: string = "";
   private alertTicker: any = null;
   private onGoing: boolean = false;
+  private mode: string = MODE_NEW;
 
   title: string = "Add";
   submitted: boolean = false;
@@ -45,8 +50,17 @@ export class ServerFormComponent implements OnInit {
 
   ngOnInit() {
     let serverId = this.route.snapshot.params['id'];
+    let viewMode = this.route.snapshot.queryParams['view']
+
     if (serverId) {
-      this.title = "Edit";
+      if (viewMode) {
+        this.title = "";
+        this.mode = MODE_VIEW;
+      }else{
+        this.title = "Edit";
+        this.mode = MODE_EDIT;
+      }
+
       this.registryService.getRegistryServer(serverId)
       .then((registryServer: RegistryServer) => {
         this.onGoing = false
@@ -78,11 +92,19 @@ export class ServerFormComponent implements OnInit {
   }
 
   cancel() {
+    if (this.isViewMode) {
+      this.router.navigateByUrl(ROUTES.POLICY_BUILD);
+      return;
+    }
     this.router.navigateByUrl(ROUTES.HOME)
   }
 
   public get isEditMode(): boolean {
-    return this.title === "Edit";
+    return this.mode === MODE_EDIT;
+  }
+
+  public get isViewMode(): boolean {
+    return this.mode === MODE_VIEW;
   }
 
   public get toggleText(): string {

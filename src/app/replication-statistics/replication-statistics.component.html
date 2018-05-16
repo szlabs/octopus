@@ -1,0 +1,43 @@
+<div class="side-stats">
+    <span (click)="back()">
+      <clr-icon shape="angle-double" class="angle-arrow" style="margin-left: -20px;"></clr-icon>
+      <clr-icon shape="angle-double" class="angle-arrow" style="margin-left: -10px;"></clr-icon>
+    </span>
+    <h3>Replication Statistics:</h3>
+    <div class="card">
+        <div class="card-block">
+            <div class="progress top">
+                <progress value="100" max="100"></progress>
+            </div>
+            <h4 class="card-title stat-title">TOTAL:</h4>
+            <p class="card-text stat-number">80</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-block">
+            <div class="progress top loop success">
+                <progress value="100" max="100"></progress>
+            </div>
+            <h4 class="card-title stat-title">RUNNING:</h4>
+            <p class="card-text stat-number">5</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-block">
+            <div class="progress top success">
+                <progress value="100" max="100"></progress>
+            </div>
+            <h4 class="card-title stat-title">SUCCESS</h4>
+            <p class="card-text stat-number stat-success">70</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-block">
+            <div class="progress top danger">
+                <progress value="100" max="100"></progress>
+            </div>
+            <h4 class="card-title stat-title">ERROR</h4>
+            <p class="card-text stat-number stat-error">5</p>
+        </div>
+    </div>
+</div>

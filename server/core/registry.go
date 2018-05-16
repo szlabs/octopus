@@ -49,6 +49,7 @@ func (r *RegistryManager) Create(registry *model.Registry) (string, error) {
 }
 
 func (r *RegistryManager) Update(registry *model.Registry) error {
+	registry.Status = registryHealthCheck(registry)
 	return r.MetadataStore.UpdateRegistry(registry)
 }
 

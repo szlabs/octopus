@@ -16,12 +16,13 @@ import { AuthService } from './service/auth.service';
 import { RegistryServerComponent } from './registry-server/registry-server.component';
 import { ServerFormComponent } from './server-form/server-form.component';
 import { TopologyBuilderComponent } from './topology-builder/topology-builder.component';
-import { VisModule } from 'ng2-vis';
 import { LoggedGuardGuard } from './guard/logged-guard.guard';
 import { PubSubService } from './service/pub-sub.service';
 import { RegistryManagementService } from './service/registry-management.service';
 import { PolicyBuilderService } from './service/policy-builder.service';
 import { ConfirmationModalComponent } from './confirmation-modal/confirmation-modal.component';
+import { ReplicationStatisticsComponent } from './replication-statistics/replication-statistics.component';
+import { ReplicationRuleComponent } from './replication-rule/replication-rule.component';
 
 @NgModule({
     declarations: [
@@ -34,7 +35,9 @@ import { ConfirmationModalComponent } from './confirmation-modal/confirmation-mo
         RegistryServerComponent,
         ServerFormComponent,
         TopologyBuilderComponent,
-        ConfirmationModalComponent
+        ConfirmationModalComponent,
+        ReplicationStatisticsComponent,
+        ReplicationRuleComponent
     ],
     imports: [
         BrowserAnimationsModule,
@@ -42,8 +45,7 @@ import { ConfirmationModalComponent } from './confirmation-modal/confirmation-mo
         FormsModule,
         HttpModule,
         ClarityModule,
-        ROUTING,
-        VisModule
+        ROUTING
     ],
     providers: [
         AuthService,

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RegistryServer } from '../interface/registry-server';
 import { RegistryStatus } from '../interface/registry-status.enum';
 import { RegistryKind } from '../interface/registry-kind.enum';
@@ -7,23 +7,25 @@ import { ROUTES } from '../consts';
 import { PubSubService } from '../service/pub-sub.service';
 import { EVENT_ALERT, EVENT_REGISTRY_LIST_UPDATED, ALERT_DANGER, ALERT_SUCCESS } from '../utils';
 import { RegistryManagementService } from '../service/registry-management.service';
+import { Subscriber, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-registry',
   templateUrl: './registry.component.html',
   styleUrls: ['./registry.component.scss']
 })
-export class RegistryComponent implements OnInit {
+export class RegistryComponent implements OnInit, OnDestroy {
 
   registries: RegistryServer[] = [];
   private onGoing: boolean = false;
+  private subscription: Subscription;
 
   constructor(
     private router: Router,
     private pubSub: PubSubService,
     private registryService: RegistryManagementService
   ) {
-    this.pubSub.on(EVENT_REGISTRY_LIST_UPDATED).subscribe(() => {
+    this.subscription = this.pubSub.on(EVENT_REGISTRY_LIST_UPDATED).subscribe(() => {
       this.refresh();
     });
   }
@@ -51,6 +53,12 @@ export class RegistryComponent implements OnInit {
 
   ngOnInit() {
     this.refresh();
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   editServer(server: RegistryServer): void {

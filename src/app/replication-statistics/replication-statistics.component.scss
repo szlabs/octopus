@@ -1,0 +1,39 @@
+.side-stats {
+    position: absolute;
+    z-index: 100;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 100%;
+    overflow: auto;
+    background: #fff;
+    padding: 20px;
+    border-left: 1px solid #e0e0e0;
+}
+
+.angle-arrow {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+    cursor: pointer;
+}
+
+.stat-title {
+    font-weight: bolder;
+}
+
+.stat-number {
+    font-weight: bolder;
+    font-size: 36px;
+    text-align: center;
+}
+
+.stat-error {
+    color: red;
+}
+
+.stat-success {
+    color: green;
+}

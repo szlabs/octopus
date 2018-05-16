@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { AboutComponent } from '../about/about.component';
 import { ROUTES } from '../consts';
 import { AuthService } from '../service/auth.service';
@@ -6,13 +6,14 @@ import { Router } from '@angular/router';
 import { AppUser } from '../interface/app-user';
 import { PubSubService } from '../service/pub-sub.service';
 import { EVENT_ALERT, ALERT_DANGER, ALERT_SUCCESS } from '../utils';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-shell',
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss']
 })
-export class ShellComponent implements OnInit {
+export class ShellComponent implements OnInit, OnDestroy {
 
   @ViewChild(AboutComponent) aboutDlg: AboutComponent;
 
@@ -22,13 +23,14 @@ export class ShellComponent implements OnInit {
   private alertType: string = ALERT_SUCCESS;
   private alertMessage: string = "";
   private alertTicker: any = null;
+  private subscription: Subscription;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private pubSub: PubSubService
   ) { 
-    this.pubSub.on(EVENT_ALERT).subscribe((message: any) => {
+    this.subscription = this.pubSub.on(EVENT_ALERT).subscribe((message: any) => {
       if (message.alertType) {
         this.showMessage(message.alertType, message.data);
       }
@@ -45,6 +47,12 @@ export class ShellComponent implements OnInit {
 
   ngOnInit() {
     this.loggedUser = this.authService.getCurrentUser();
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   about() {

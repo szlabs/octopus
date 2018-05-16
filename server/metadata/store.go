@@ -3,6 +3,7 @@ package metadata
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"sync"
 	"time"
 
@@ -111,6 +112,7 @@ func (s *Store) UpdateRegistry(registry *model.Registry) error {
 			reg.Insecure = registry.Insecure
 			reg.Status = registry.Status
 			reg.UpdateTime = time.Now().Unix()
+			log.Printf("Metadata updates: %#+v\n", reg)
 			break
 		}
 	}
