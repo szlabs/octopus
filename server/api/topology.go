@@ -140,6 +140,7 @@ func CreateEdge(rw http.ResponseWriter, r *http.Request) {
 	}
 	id, err := core.DefaultTopologyMgr.CreateEdge(
 		&model.Edge{
+			ID:        edge.ID,
 			SRCNodeID: srcReg.ID,
 			DSTNodeID: dstReg.ID,
 			PolicyID:  policyID,
@@ -252,7 +253,19 @@ func GetEdgePolicy(rw http.ResponseWriter, r *http.Request) {
 		handleInternalServerError(rw, err)
 		return
 	}
-	if err = writeJSON(rw, policy); err != nil {
+	res := &edgeReq{
+		ID:        edge.ID,
+		SRCNodeID: edge.SRCNodeID,
+		DSTNodeID: edge.DSTNodeID,
+		Policy: &policyReq{
+			Description:       policy.Description,
+			ProjectID:         policy.Projects[0].ID,
+			Filters:           policy.Filters,
+			Trigger:           policy.Trigger,
+			ReplicateDeletion: policy.ReplicateDeletion,
+		},
+	}
+	if err = writeJSON(rw, res); err != nil {
 		handleInternalServerError(rw, err)
 	}
 }

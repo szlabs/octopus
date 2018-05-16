@@ -4,6 +4,7 @@ import { HTTP_JSON_OPTIONS } from './options';
 import { RegistryServer } from '../interface/registry-server';
 
 const REGISTRIES_URL = "/api/v1/registries";
+const REGISTRY_PING_URL = "/api/v1/registries/{id}/ping";
 
 @Injectable()
 export class RegistryManagementService {
@@ -40,6 +41,12 @@ export class RegistryManagementService {
   public getRegistryServer(id: string): Promise<RegistryServer> {
     return this.http.get(REGISTRIES_URL + "/" + id, HTTP_JSON_OPTIONS).toPromise()
     .then(response => response.json() as RegistryServer)
+    .catch(error => Promise.reject(error));
+  }
+
+  public pingRegistryServer(id: string): Promise<any> {
+    return this.http.post(REGISTRY_PING_URL.replace("{id}", id), null, HTTP_JSON_OPTIONS).toPromise()
+    .then(() => Promise.resolve(true))
     .catch(error => Promise.reject(error));
   }
 

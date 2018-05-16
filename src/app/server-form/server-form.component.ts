@@ -8,7 +8,13 @@ import { SlideInOutAnimation } from '../_animations/index';
 import { ROUTES } from '../consts';
 import { RegistryManagementService } from '../service/registry-management.service';
 import { PubSubService } from '../service/pub-sub.service';
-import { ALERT_SUCCESS, EVENT_ALERT, EVENT_REGISTRY_LIST_UPDATED } from '../utils';
+import { 
+  ALERT_SUCCESS, 
+  EVENT_ALERT, 
+  EVENT_REGISTRY_LIST_UPDATED,
+  EVENT_NODE_REMOVED
+ } from '../utils';
+import { PolicyBuilderService } from '../service/policy-builder.service';
 
 const MODE_NEW: string = "NEW";
 const MODE_EDIT: string = "EDIT";
@@ -45,7 +51,8 @@ export class ServerFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private registryService: RegistryManagementService,
-    private pubSub: PubSubService
+    private pubSub: PubSubService,
+    private builderService: PolicyBuilderService
   ) { }
 
   ngOnInit() {
@@ -165,6 +172,28 @@ export class ServerFormComponent implements OnInit {
       clearTimeout(this.alertTicker);
       this.alertTicker = null;
     }
+  }
+
+  private remove(): void {
+    if (this.onGoing) {
+      return;
+    }
+
+    if (!this.model || !this.model.id){
+      return;
+    }
+
+    this.onGoing = true;
+    this.builderService.removeNode(this.model.id)
+    .then(() => {
+      this.onGoing = false;
+      this.pubSub.publish(EVENT_NODE_REMOVED, {id: this.model.id});
+      this.router.navigateByUrl(ROUTES.POLICY_BUILD);
+    })
+    .catch(error => {
+      this.onGoing = false;
+      this.showError(error);
+    });
   }
 
 }

@@ -112,7 +112,7 @@ func initHandler() http.Handler {
 		HandlerFunc(api.DeleteEdge)
 	router.NewRoute().Path("/topology/edges/{id}/status").Methods(http.MethodGet).
 		HandlerFunc(api.GetEdgeStatus)
-	router.NewRoute().Path("/topology/edges/{id}/policy").Methods(http.MethodGet).
+	router.NewRoute().Path("/topology/edges/{id}").Methods(http.MethodGet).
 		HandlerFunc(api.GetEdgePolicy)
 
 	authHandler := api.NewAuthHandler(router, "/api/v1/login", "/api/v1/logout")

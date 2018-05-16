@@ -4,8 +4,9 @@ import { RegistryKind } from '../interface/registry-kind.enum';
 import { RegistryStatus } from '../interface/registry-status.enum';
 import { FadeInAnimation } from '../_animations/index';
 import { PubSubService } from '../service/pub-sub.service';
-import { EVENT_MODAL_CONFIRM, EVENT_OPEN_MODAL } from '../utils';
+import { EVENT_MODAL_CONFIRM, EVENT_OPEN_MODAL, EVENT_ALERT } from '../utils';
 import { Subscription } from 'rxjs';
+import { RegistryManagementService } from '../service/registry-management.service';
 
 @Component({
   selector: 'app-registry-server',
@@ -20,12 +21,13 @@ export class RegistryServerComponent implements OnInit, OnDestroy {
   onGoing: boolean = false;
   @Output() editServer: EventEmitter<RegistryServer> = new EventEmitter<RegistryServer>();
   @Output() deleteServer: EventEmitter<RegistryServer> = new EventEmitter<RegistryServer>();
-  @Output() pingServer: EventEmitter<RegistryServer> = new EventEmitter<RegistryServer>();
+  //@Output() pingServer: EventEmitter<RegistryServer> = new EventEmitter<RegistryServer>();
 
   private subscription: Subscription;
 
   constructor(
-    private pubSub: PubSubService
+    private pubSub: PubSubService,
+    private registryService: RegistryManagementService
   ) {
     this.subscription = this.pubSub.on(EVENT_MODAL_CONFIRM).subscribe(data => {
       if (data && data.id && data.id === this.data.id) {
@@ -98,6 +100,10 @@ export class RegistryServerComponent implements OnInit, OnDestroy {
     });
   }
 
+  private showError(error: string) {
+    this.pubSub.publish(EVENT_ALERT, {});
+  }
+
   edit(): void {
     this.editServer.emit(this.data);
   }
@@ -107,7 +113,24 @@ export class RegistryServerComponent implements OnInit, OnDestroy {
   }
 
   ping(): void {
-    this.pingServer.emit(this.data);
+    if (this.onGoing) {
+      return;
+    }
+    if (!this.data || !this.data.id){
+      return;
+    }
+
+    this.onGoing = true;
+    this.registryService.pingRegistryServer(this.data.id)
+    .then(() => {
+      this.onGoing = false;
+      this.data.status = RegistryStatus.HEALTHY;
+    })
+    .catch(error => {
+      this.onGoing = false;
+      this.data.status = RegistryStatus.UNAVAILABLE;
+      this.showError('' + error);
+    });
   }
 
 }

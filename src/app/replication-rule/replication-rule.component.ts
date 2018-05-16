@@ -3,7 +3,7 @@ import { SlideInOutAnimation } from '../_animations/index';
 import { EdgeRequest, Project } from '../interface/replication';
 import { ROUTES } from '../consts';
 import { Router, ActivatedRoute, Route } from '@angular/router';
-import { getOfftime, setOfftime, EVENT_CANCEL_CREATING_EDGE } from '../utils';
+import { getOfftime, setOfftime, EVENT_CANCEL_CREATING_EDGE, EVENT_EDGE_REMOVED } from '../utils';
 import { PolicyBuilderService } from '../service/policy-builder.service';
 import { PubSubService } from '../service/pub-sub.service';
 
@@ -20,6 +20,7 @@ export class ReplicationRuleComponent implements OnInit {
   private alertMessage: string = "";
   private ticker: any = null;
   private model: EdgeRequest = {
+    id: "",
     src_node_id: "",
     dst_node_id: "",
     policy: {
@@ -46,7 +47,6 @@ export class ReplicationRuleComponent implements OnInit {
     { v: 6, day: "Saturday" },
     { v: 7, day: "Sunday" },
   ];
-  private edgeId: string = "";
   private isCreatingEdge: boolean = false;
   private srcNodeName: string = "";
   private destNodeName: string = "";
@@ -60,7 +60,7 @@ export class ReplicationRuleComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.edgeId = this.route.snapshot.params['id'];
+    this.model.id = this.route.snapshot.params['id'];
     let srcNode = this.route.snapshot.queryParams['src'];
     if (srcNode) {
       this.model.src_node_id = srcNode;
@@ -72,28 +72,41 @@ export class ReplicationRuleComponent implements OnInit {
 
     if (srcNode && destNode) {
       this.isCreatingEdge = true;
-      let srcNodeName: string = this.route.snapshot.queryParams['src_node'];
-      let destNodeName: string = this.route.snapshot.queryParams['dest_node'];
-      if (srcNodeName) {
-        srcNodeName = atob(srcNodeName);
-      }
-      if (destNodeName) {
-        destNodeName = atob(destNodeName);
-      }
-
-      this.srcNodeName = srcNodeName || srcNode;
-      this.destNodeName = destNodeName || destNode;
     }
+
+    let srcNodeName: string = this.route.snapshot.queryParams['src_node'];
+    let destNodeName: string = this.route.snapshot.queryParams['dest_node'];
+    if (srcNodeName) {
+      srcNodeName = atob(srcNodeName);
+    }
+    if (destNodeName) {
+      destNodeName = atob(destNodeName);
+    }
+
+    this.srcNodeName = srcNodeName || srcNode || "n/a";
+    this.destNodeName = destNodeName || destNode || "n/a";
 
     if (this.isCreatingEdge) {
       this.builderService.getProjectList(this.model.src_node_id)
-      .then((proList: Project[]) => {
-        this.projectList = proList;
-        if (this.projectList && this.projectList.length > 0) {
-          this.model.policy.project_id = this.projectList[0].id;
-        }
-      })
-      .catch(error => this.showError('' + error));
+        .then((proList: Project[]) => {
+          this.projectList = proList;
+          if (this.projectList && this.projectList.length > 0) {
+            this.model.policy.project_id = this.projectList[0].id;
+          }
+        })
+        .catch(error => this.showError('' + error));
+    } else {
+      //view mode
+      this.builderService.getEdge(this.model.id)
+        .then((data: EdgeRequest) => {
+          this.model = data;
+          this.builderService.getProjectList(this.model.src_node_id)
+            .then((proList: Project[]) => {
+              this.projectList = proList;
+            })
+            .catch(error => this.showError(error));
+        })
+        .catch(error => this.showError(error));
     }
   }
 
@@ -192,7 +205,7 @@ export class ReplicationRuleComponent implements OnInit {
       this.model.policy &&
       this.model.policy.trigger &&
       this.model.policy.trigger.schedule_param) {
-        return getOfftime(this.model.policy.trigger.schedule_param.offtime);
+      return getOfftime(this.model.policy.trigger.schedule_param.offtime);
     }
 
     return "00:00";
@@ -203,7 +216,7 @@ export class ReplicationRuleComponent implements OnInit {
       this.model.policy &&
       this.model.policy.trigger &&
       this.model.policy.trigger.schedule_param) {
-        this.model.policy.trigger.schedule_param.offtime = setOfftime(v);
+      this.model.policy.trigger.schedule_param.offtime = setOfftime(v);
     }
   }
 
@@ -234,21 +247,49 @@ export class ReplicationRuleComponent implements OnInit {
       return;
     }
 
+    if (typeof this.model.policy.project_id === "string") {
+      this.model.policy.project_id = parseInt(this.model.policy.project_id);
+    }
+
+    this.onGoing = true;
+
     this.builderService.addEdge(this.model)
-    .then(res => {
-      this.router.navigateByUrl(ROUTES.POLICY_BUILD);
-    })
-    .catch(error => {
-      this.onGoing = false;
-      this.showError(''+error);
-    });
+      .then(res => {
+        this.onGoing = false;
+        this.router.navigateByUrl(ROUTES.POLICY_BUILD);
+      })
+      .catch(error => {
+        this.onGoing = false;
+        this.showError('' + error);
+      });
   }
 
   private cancel(): void {
-    if (this.isCreatingEdge){
-      this.pubSub.publish(EVENT_CANCEL_CREATING_EDGE, {edgeId: this.edgeId});
+    if (this.isCreatingEdge && this.model.id) {
+      this.pubSub.publish(EVENT_CANCEL_CREATING_EDGE, { edgeId: this.model.id });
     }
     this.router.navigateByUrl(ROUTES.POLICY_BUILD);
+  }
+
+  private remove(): void {
+    if (this.onGoing) {
+      return;
+    }
+
+    this.onGoing = true;
+    if (!this.isCreatingEdge && this.model.id) {
+      this.builderService.removeEdge(this.model.id)
+        .then(() => {
+          this.onGoing =false;
+          //publish
+          this.pubSub.publish(EVENT_EDGE_REMOVED, { id: this.model.id });
+          this.router.navigateByUrl(ROUTES.POLICY_BUILD);
+        })
+        .catch(error => {
+          this.onGoing = false;
+          this.showError(error);
+        });
+    }
   }
 
 }

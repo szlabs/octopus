@@ -12,7 +12,11 @@
         <div class="side-form">
             <form #serverForm="ngForm" (ngSubmit)="onSubmit()" [hidden]="submitted" class="compact">
                 <section class="form-block">
-                    <label>{{title}} Registry Server Information</label>
+                    <label>{{title}} Registry Server Information
+                        <span class="spinner spinner-inline spinner-md" [hidden]="!onGoing">
+                            Loading...
+                        </span>
+                    </label>
                     <div class="form-group" *ngIf="isEditMode || isViewMode">
                         <label for="serverID" class="required">Server ID</label>
                         <input type="text" id="serverID" placeholder="srv_random" disabled name="serverID" [(ngModel)]="model.id" #serverID="ngModel" class="input-box">
@@ -73,7 +77,8 @@
                             <label for="insecure">{{toggleText}}</label>
                         </div>
                     </div>
-                    <button class="btn btn-primary" type="submit" [disabled]="serverForm.form.invalid" [hidden]="isViewMode">Add</button>
+                    <button class="btn btn-primary" type="submit" [disabled]="serverForm.form.invalid || onGoing" [hidden]="isViewMode">Add</button>
+                    <button class="btn btn-danger" type="button" [disabled]="onGoing" (click)="remove()" [hidden]="!isViewMode">Remove</button>
                     <button class="btn btn-outline" type="button" (click)="cancel()">Cancel</button>
                 </section>
             </form>

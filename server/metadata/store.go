@@ -232,7 +232,7 @@ func (s *Store) CreateTopologyEdge(edge *model.Edge) (string, error) {
 		meta.Topology = &model.Topology{}
 	}
 
-	edge.ID = uuid.NewV4().String()
+	//edge.ID = uuid.NewV4().String()
 	meta.Topology.Edges = append(meta.Topology.Edges, edge)
 	if err = s.write(meta); err != nil {
 		return "", err

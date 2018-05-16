@@ -30,6 +30,12 @@ export class PolicyBuilderService {
     .catch(error => Promise.reject(error));
   }
 
+  public removeNode(id: string): Promise<any> {
+    return this.http.delete(TOPOLOGY_NODES_URL + '/' + id, HTTP_JSON_OPTIONS).toPromise()
+    .then(() => Promise.resolve(true))
+    .catch(error => Promise.reject(error));
+  }
+
   public getProjectList(id: string): Promise<Project[]> {
     return this.http.get(PROJECT_LIST.replace("{id}", id), HTTP_JSON_OPTIONS).toPromise()
     .then(response => response.json() as Project[])
@@ -39,6 +45,18 @@ export class PolicyBuilderService {
   public addEdge(edgeReq: EdgeRequest): Promise<any> {
     return this.http.post(TOPOLOGY_EDGES_URL, JSON.stringify(edgeReq), HTTP_JSON_OPTIONS).toPromise()
     .then(response => Promise.resolve(response.json()))
+    .catch(error => Promise.reject(error));
+  }
+
+  public getEdge(id: string): Promise<EdgeRequest> {
+    return this.http.get(TOPOLOGY_EDGES_URL + '/' + id, HTTP_JSON_OPTIONS).toPromise()
+    .then(response => response.json() as EdgeRequest)
+    .catch(error => Promise.reject(error));
+  }
+
+  public removeEdge(id: string): Promise<any> {
+    return this.http.delete(TOPOLOGY_EDGES_URL + '/' + id, HTTP_JSON_OPTIONS).toPromise()
+    .then(() => Promise.resolve(true))
     .catch(error => Promise.reject(error));
   }
 
