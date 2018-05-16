@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,6 +12,10 @@ import (
 	"github.com/steven-zou/topological-replication/server/model"
 	"github.com/steven-zou/topological-replication/server/util"
 	common_http "github.com/vmware/harbor/src/common/http"
+)
+
+var (
+	ErrEdgeNotFound = errors.New("edge not found")
 )
 
 func GetTopology(rw http.ResponseWriter, r *http.Request) {
@@ -194,32 +199,17 @@ func DeleteEdge(rw http.ResponseWriter, r *http.Request) {
 
 func GetEdgeStatus(rw http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
-	edge, err := core.DefaultTopologyMgr.GetEdge(id)
+	jobs, err := getEdgeStatus(id)
 	if err != nil {
+		if err == ErrEdgeNotFound {
+			log.Printf("edge %s not found \n", id)
+			handleNotFound(rw)
+			return
+		}
 		handleInternalServerError(rw, err)
-		return
-	}
-	if edge == nil {
-		log.Printf("edge %s not found \n", id)
-		handleNotFound(rw)
 		return
 	}
 
-	registry, err := core.DefaultRegMgr.Get(edge.SRCNodeID)
-	if err != nil {
-		handleInternalServerError(rw, err)
-		return
-	}
-	if registry == nil {
-		handleInternalServerError(rw, fmt.Errorf("registry %s not exist", edge.SRCNodeID))
-		return
-	}
-	client := util.New(registry.URL, registry.Username, registry.Password, registry.Insecure)
-	jobs, err := client.GetJobs(edge.PolicyID)
-	if err != nil {
-		handleInternalServerError(rw, err)
-		return
-	}
 	if err = writeJSON(rw, jobs); err != nil {
 		handleInternalServerError(rw, err)
 	}
@@ -268,4 +258,54 @@ func GetEdgePolicy(rw http.ResponseWriter, r *http.Request) {
 	if err = writeJSON(rw, res); err != nil {
 		handleInternalServerError(rw, err)
 	}
+}
+
+func GetTopologyStatus(rw http.ResponseWriter, r *http.Request) {
+	status := map[string][]*model.Job{}
+	topology, err := core.DefaultTopologyMgr.Get()
+	if err != nil {
+		handleInternalServerError(rw, err)
+		return
+	}
+	if topology != nil {
+		for _, edge := range topology.Edges {
+			if edge == nil {
+				continue
+			}
+			jobs, err := getEdgeStatus(edge.ID)
+			if err != nil {
+				handleInternalServerError(rw, err)
+				return
+			}
+			status[edge.ID] = jobs
+		}
+	}
+
+	if err = writeJSON(rw, status); err != nil {
+		handleInternalServerError(rw, err)
+	}
+}
+
+func getEdgeStatus(id string) ([]*model.Job, error) {
+	edge, err := core.DefaultTopologyMgr.GetEdge(id)
+	if err != nil {
+		return nil, err
+	}
+	if edge == nil {
+		return nil, ErrEdgeNotFound
+	}
+
+	registry, err := core.DefaultRegMgr.Get(edge.SRCNodeID)
+	if err != nil {
+		return nil, err
+	}
+	if registry == nil {
+		return nil, fmt.Errorf("registry %s not exist", edge.SRCNodeID)
+	}
+	client := util.New(registry.URL, registry.Username, registry.Password, registry.Insecure)
+	jobs, err := client.GetJobs(edge.PolicyID)
+	if err != nil {
+		return nil, err
+	}
+	return jobs, nil
 }
