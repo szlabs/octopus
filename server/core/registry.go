@@ -64,6 +64,19 @@ func (r *RegistryManager) Delete(id string) error {
 	return r.MetadataStore.DeleteRegistry(id)
 }
 
+func (r *RegistryManager) Ping(id string) error {
+	registry, err := r.Get(id)
+	if err != nil {
+		return err
+	}
+	if registry == nil {
+		return ErrRegNotFound
+	}
+
+	client := util.New(registry.URL, registry.Username, registry.Password, registry.Insecure)
+	return client.Ping(registry.URL, registry.Username, registry.Password, registry.Insecure)
+}
+
 func (r *RegistryManager) List() ([]*model.Registry, error) {
 	return r.MetadataStore.ListRegistries()
 }

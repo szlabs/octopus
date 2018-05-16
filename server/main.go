@@ -96,6 +96,8 @@ func initHandler() http.Handler {
 		HandlerFunc(api.UpdateRegistry)
 	router.NewRoute().Path("/registries/{id}").Methods(http.MethodGet).
 		HandlerFunc(api.GetRegistry)
+	router.NewRoute().Path("/registries/{id}/ping").Methods(http.MethodPost).
+		HandlerFunc(api.PingRegistry)
 	router.NewRoute().Path("/registries/{id}/projects").Methods(http.MethodGet).
 		HandlerFunc(api.ListProjects)
 	router.NewRoute().Path("/topology").Methods(http.MethodGet).
@@ -110,6 +112,8 @@ func initHandler() http.Handler {
 		HandlerFunc(api.DeleteEdge)
 	router.NewRoute().Path("/topology/edges/{id}/status").Methods(http.MethodGet).
 		HandlerFunc(api.GetEdgeStatus)
+	router.NewRoute().Path("/topology/edges/{id}/policy").Methods(http.MethodGet).
+		HandlerFunc(api.GetEdgePolicy)
 
 	authHandler := api.NewAuthHandler(router, "/api/v1/login", "/api/v1/logout")
 	handler := handlers.LoggingHandler(os.Stdout, authHandler)

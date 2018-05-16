@@ -223,3 +223,36 @@ func GetEdgeStatus(rw http.ResponseWriter, r *http.Request) {
 		handleInternalServerError(rw, err)
 	}
 }
+
+func GetEdgePolicy(rw http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	edge, err := core.DefaultTopologyMgr.GetEdge(id)
+	if err != nil {
+		handleInternalServerError(rw, err)
+		return
+	}
+	if edge == nil {
+		log.Printf("edge %s not found \n", id)
+		handleNotFound(rw)
+		return
+	}
+
+	registry, err := core.DefaultRegMgr.Get(edge.SRCNodeID)
+	if err != nil {
+		handleInternalServerError(rw, err)
+		return
+	}
+	if registry == nil {
+		handleInternalServerError(rw, fmt.Errorf("registry %s not exist", edge.SRCNodeID))
+		return
+	}
+	client := util.New(registry.URL, registry.Username, registry.Password, registry.Insecure)
+	policy, err := client.GetPolicy(edge.PolicyID)
+	if err != nil {
+		handleInternalServerError(rw, err)
+		return
+	}
+	if err = writeJSON(rw, policy); err != nil {
+		handleInternalServerError(rw, err)
+	}
+}

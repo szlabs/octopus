@@ -92,6 +92,14 @@ func (c *Client) DeletePolicy(id int64) error {
 	return c.Delete(fmt.Sprintf("%s/api/policies/replication/%d", c.url, id))
 }
 
+func (c *Client) GetPolicy(id int64) (*Policy, error) {
+	policy := &Policy{}
+	if err := c.Get(fmt.Sprintf("%s/api/policies/replication/%d", c.url, id), policy); err != nil {
+		return nil, err
+	}
+	return policy, nil
+}
+
 func (c *Client) GetJobs(policyID int64) ([]*model.Job, error) {
 	u, err := url.Parse(fmt.Sprintf("%s/api/jobs/replication", c.url))
 	if err != nil {

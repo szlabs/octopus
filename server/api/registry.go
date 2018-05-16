@@ -87,6 +87,19 @@ func DeleteRegistry(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func PingRegistry(rw http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	if err := core.DefaultRegMgr.Ping(id); err != nil {
+		if err == core.ErrRegNotFound {
+			handleNotFound(rw)
+			return
+		}
+		log.Printf("%v \n", err)
+		handleBadRequest(rw)
+		return
+	}
+}
+
 func ListProjects(rw http.ResponseWriter, r *http.Request) {
 	registryID := mux.Vars(r)["id"]
 	registry, err := core.DefaultRegMgr.Get(registryID)
