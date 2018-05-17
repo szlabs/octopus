@@ -7,7 +7,7 @@
     <div class="col-xs-11 col-sm-11 col-md-11 col-lg-11 col-xl-11"></div>
     <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xl-1">
         <button class="btn btn-primary" type="button" (click)="refresh()">
-            <clr-icon shape="refresh"></clr-icon>Refresh</button>
+            <clr-icon shape="refresh"></clr-icon>Refit</button>
     </div>
 </div>
 <div class="row" style="margin-top: 25px;">
@@ -26,7 +26,10 @@
                         <clr-icon *ngSwitchCase="1" shape="plus-circle" class="green-icon"></clr-icon>
                         <clr-icon *ngSwitchCase="2" shape="success-standard" class="is-solid green-icon"></clr-icon>
                         {{c.server.name}}</h4>
-                    <p class="card-text">ID: {{c.server.id}}</p>
+                    <div class="card-text">
+                        <div>ID: {{c.server.id}}</div>
+                        <div>URL: {{c.server.url}}</div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -3,7 +3,13 @@ import { SlideInOutAnimation } from '../_animations/index';
 import { EdgeRequest, Project } from '../interface/replication';
 import { ROUTES } from '../consts';
 import { Router, ActivatedRoute, Route } from '@angular/router';
-import { getOfftime, setOfftime, EVENT_CANCEL_CREATING_EDGE, EVENT_EDGE_REMOVED } from '../utils';
+import { 
+  getOfftime, 
+  setOfftime, 
+  EVENT_CANCEL_CREATING_EDGE, 
+  EVENT_EDGE_REMOVED,
+  EVENT_EDGE_ADDED,
+  getEdgeLabel } from '../utils';
 import { PolicyBuilderService } from '../service/policy-builder.service';
 import { PubSubService } from '../service/pub-sub.service';
 
@@ -256,6 +262,8 @@ export class ReplicationRuleComponent implements OnInit {
     this.builderService.addEdge(this.model)
       .then(res => {
         this.onGoing = false;
+        let label: string = getEdgeLabel(this.model);
+        this.pubSub.publish(EVENT_EDGE_ADDED, {id: this.model.id, label: label});
         this.router.navigateByUrl(ROUTES.POLICY_BUILD);
       })
       .catch(error => {

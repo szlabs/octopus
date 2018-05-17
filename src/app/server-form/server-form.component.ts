@@ -14,7 +14,6 @@ import {
   EVENT_REGISTRY_LIST_UPDATED,
   EVENT_NODE_REMOVED
  } from '../utils';
-import { PolicyBuilderService } from '../service/policy-builder.service';
 
 const MODE_NEW: string = "NEW";
 const MODE_EDIT: string = "EDIT";
@@ -51,8 +50,7 @@ export class ServerFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private registryService: RegistryManagementService,
-    private pubSub: PubSubService,
-    private builderService: PolicyBuilderService
+    private pubSub: PubSubService
   ) { }
 
   ngOnInit() {
@@ -183,17 +181,8 @@ export class ServerFormComponent implements OnInit {
       return;
     }
 
-    this.onGoing = true;
-    this.builderService.removeNode(this.model.id)
-    .then(() => {
-      this.onGoing = false;
-      this.pubSub.publish(EVENT_NODE_REMOVED, {id: this.model.id});
-      this.router.navigateByUrl(ROUTES.POLICY_BUILD);
-    })
-    .catch(error => {
-      this.onGoing = false;
-      this.showError(error);
-    });
+    this.pubSub.publish(EVENT_NODE_REMOVED, {id: this.model.id});
+    this.router.navigateByUrl(ROUTES.POLICY_BUILD);
   }
 
 }

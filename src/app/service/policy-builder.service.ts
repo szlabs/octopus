@@ -34,7 +34,7 @@ export class PolicyBuilderService {
 
   public removeNode(id: string): Promise<any> {
     return this.http.delete(TOPOLOGY_NODES_URL + '/' + id, HTTP_JSON_OPTIONS).toPromise()
-    .then(() => Promise.resolve(true))
+    .then(() => Promise.resolve(id))
     .catch(error => Promise.reject(error));
   }
 
@@ -58,7 +58,7 @@ export class PolicyBuilderService {
 
   public removeEdge(id: string): Promise<any> {
     return this.http.delete(TOPOLOGY_EDGES_URL + '/' + id, HTTP_JSON_OPTIONS).toPromise()
-    .then(() => Promise.resolve(true))
+    .then(() => Promise.resolve(id))
     .catch(error => Promise.reject(error));
   }
 

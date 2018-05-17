@@ -13,14 +13,19 @@ import {
   EVENT_NODE_REMOVED,
   STATUS_ERROR,
   STATUS_RUNNING,
-  STATUS_SUCCESS
+  STATUS_SUCCESS,
+  ALL_DAYS,
+  getOfftime,
+  getEdgeLabel,
+  EVENT_EDGE_ADDED
 } from '../utils';
 import { RegistryServer } from '../interface/registry-server';
 import { RegistryCandidate } from '../interface/registry-candidate';
 import { ROUTES } from '../consts';
 import { Router, NavigationExtras } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Job, JobStats, JobStatsSummary } from '../interface/replication';
+import { Job, JobStats, JobStatsSummary, EdgeRequest, ScheduleParam } from '../interface/replication';
+import { error } from 'util';
 
 const NETWORK_ID: string = "policy_topology_canvas";
 const COLORS: string[] = ["#06c4b7", "#06c49a", "#06c474", "#06c436", "#07c40a"];
@@ -45,6 +50,7 @@ export class TopologyBuilderComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
   private xNodeSubscription: Subscription;
   private xEdgeSubscription: Subscription;
+  private edgeAddedSubscription: Subscription;
   private refreshTicker: any = null;
 
   constructor(
@@ -66,6 +72,16 @@ export class TopologyBuilderComponent implements OnInit, OnDestroy {
     });
     this.xNodeSubscription = this.pubSub.on(EVENT_NODE_REMOVED).subscribe(data => {
       this.removeNode(data.id);
+    });
+    this.edgeAddedSubscription = this.pubSub.on(EVENT_EDGE_ADDED).subscribe(data => {
+      if (data && data.id) {
+        let changingEdge: Edge = this.edges.get('' + data.id);
+        if (changingEdge) {
+          this.edges.remove('' + data.id);
+          changingEdge.label = data.label;
+          this.edges.add(changingEdge);
+        }
+      }
     });
   }
 
@@ -104,15 +120,30 @@ export class TopologyBuilderComponent implements OnInit, OnDestroy {
       nodes.forEach(r => {
         this.nodes.add({
           id: r.id,
-          label: r.name
+          label: r.name + '\n (' + r.url + ')'
         });
       });
       edges.forEach(e => {
-        this.edges.add({
-          id: e.id,
-          from: e.src_node_id,
-          to: e.dst_node_id
-        });
+        //TODO: Should return by the topology
+        this.builderService.getEdge(e.id)
+          .then(((res: EdgeRequest) => {
+            let label: string = getEdgeLabel(res);
+            this.edges.add({
+              id: e.id,
+              from: e.src_node_id,
+              to: e.dst_node_id,
+              label: label
+            });
+          }))
+          .catch(error => {
+            //No label info
+            console.error(error);
+            this.edges.add({
+              id: e.id,
+              from: e.src_node_id,
+              to: e.dst_node_id
+            });
+          });
       });
 
       this.network.redraw();
@@ -131,6 +162,19 @@ export class TopologyBuilderComponent implements OnInit, OnDestroy {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+
+    if (this.edgeAddedSubscription) {
+      this.edgeAddedSubscription.unsubscribe();
+    }
+
+    if (this.xEdgeSubscription) {
+      this.xEdgeSubscription.unsubscribe();
+    }
+
+    if (this.xNodeSubscription) {
+      this.xNodeSubscription.unsubscribe();
+    }
+
     this.network.off("doubleClick");
     if (this.timers) {
       for (let k of Object.keys(this.timers)) {
@@ -171,14 +215,13 @@ export class TopologyBuilderComponent implements OnInit, OnDestroy {
               //change color of edge
               if (jobStats.runningOnes > 0) {
                 //this.network.updateEdge(k, {color: "#07c40a"});
-              }else {
+              } else {
                 if (jobStats.failedOnes > 0) {
                   //this.network.updateEdge(k, {color: "#ed3507"});
-                }else{
+                } else {
                   if (jobStats.total != 0 && jobStats.total === jobStats.successOnes) {
-                    edge.color = "#72ed07";
+                    //edge.color = "#72ed07";
                     //this.edges.update(edge);
-                    //console.log(this.network);
                     //this.network.updateEdge(k, {color: "#72ed07"});
                   }
                 }
@@ -309,17 +352,20 @@ export class TopologyBuilderComponent implements OnInit, OnDestroy {
       selectionWidth: 5,
       length: 500,
       color: {
-        inherit: 'to'
+        inherit: 'both'
       },
       smooth: {
         enabled: true,
         type: "dynamic",
         forceDirection: "vertical",
         roundness: 1
+      },
+      font: {
+        align: "horizontal"
       }
     };
     let nodeOptions: NodeOptions = {
-      shape: "circle",
+      shape: "database",
       borderWidth: 2,
       borderWidthSelected: 5,
       color: {
@@ -514,11 +560,37 @@ export class TopologyBuilderComponent implements OnInit, OnDestroy {
   }
 
   private removeNode(id: string) {
-    if (this.nodes.get(id)) {
-      this.nodes.remove(id);
-      let foundOne = this.candidates.find((item: RegistryCandidate) => item.server.id === id);
-      if (foundOne) {
-        foundOne.added = false;
+    if (this.nodes.get(id) && !this.onGoing) {
+      //Remove topology edges first
+      let removedEdges: Edge[] = this.edges.map((edge: Edge) => {
+        if (edge.from === id || edge.to === id) {
+          return edge;
+        }
+      });
+      if (removedEdges && removedEdges.length > 0) {
+        let promises: Promise<any>[] = [];
+        removedEdges.forEach((e: Edge) => {
+          promises.push(this.builderService.removeEdge('' + e.id));
+        });
+
+        this.onGoing = true;
+        Promise.all(promises)
+          .then((results: string[]) => {
+            this.onGoing = false;
+            //confirm edges are removed from the dataset
+            for (let id of results) {
+              this.edges.remove(id);
+            }
+            //remove topology node
+            this.removeTopologyNode(id);
+          })
+          .catch(error => {
+            this.onGoing = false;
+            this.showError('' + error);
+          });
+      } else {
+        //Directly remove the topology node
+        this.removeTopologyNode(id);
       }
     }
   }
@@ -527,5 +599,25 @@ export class TopologyBuilderComponent implements OnInit, OnDestroy {
     if (this.edges.get(id)) {
       this.edges.remove(id);
     }
+  }
+
+  private removeTopologyNode(id: string): void {
+    if (this.onGoing) {
+      return;
+    }
+    this.onGoing = true;
+    this.builderService.removeNode(id)
+      .then(() => {
+        this.onGoing = false;
+        this.nodes.remove(id);
+        let foundOne = this.candidates.find((item: RegistryCandidate) => item.server.id === id);
+        if (foundOne) {
+          foundOne.added = false;
+        }
+      })
+      .catch(error => {
+        this.onGoing = false;
+        this.showError(error);
+      })
   }
 }

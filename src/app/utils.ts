@@ -1,3 +1,5 @@
+import { EdgeRequest, ScheduleParam } from './interface/replication';
+
 export function Guid() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -86,6 +88,50 @@ export const ALERT_DANGER = "alert-danger";
 export const EVENT_CANCEL_CREATING_EDGE = "x-creating-edge";
 export const EVENT_NODE_REMOVED = "x-node-removed";
 export const EVENT_EDGE_REMOVED = "x-edge-removed";
+export const EVENT_EDGE_ADDED = "+edge-added";
 export const STATUS_RUNNING = "running";
 export const STATUS_SUCCESS = "finished";
 export const STATUS_ERROR = "error";
+export const ALL_DAYS: any[] = [
+  { v: 1, day: "Monday" },
+  { v: 2, day: "Tuesday" },
+  { v: 3, day: "Wednesday" },
+  { v: 4, day: "Thursday" },
+  { v: 5, day: "Friday" },
+  { v: 6, day: "Saturday" },
+  { v: 7, day: "Sunday" },
+];
+
+export function getEdgeLabel(req: EdgeRequest): string {
+  if(!req.policy || !req.policy.trigger || !req.policy.trigger.kind) {
+    return "<n/a>";
+  }
+
+  let label: string = 'Replicate: ' + req.policy.trigger.kind;
+  if(req.policy.trigger.kind === "Scheduled") {
+    let params:ScheduleParam = req.policy.trigger.schedule_param;
+    if (params && params.type) {
+      label += ' by ' + params.type;
+      if (params.type === "Weekly") {
+        let day = params.weekday;
+        if (typeof day === "string" ) {
+          day = parseInt(day);
+        }
+        let dayText = ALL_DAYS.map(d => {
+          if (d.v === day) {
+            return d.day;
+          }
+        });
+        if (dayText) {
+          label += ' on ' + dayText;
+        }
+      }
+      let timeText = getOfftime(params.offtime);
+      if (timeText) {
+        label += ' at ' + timeText;
+      }
+    }
+  }
+
+  return label;
+}
