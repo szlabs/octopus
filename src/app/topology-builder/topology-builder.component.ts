@@ -181,17 +181,23 @@ export class TopologyBuilderComponent implements OnInit, OnDestroy {
         clearInterval(this.timers[k]);
       }
     }
+
+    this.stopStatusMonitor();
   }
 
   private startStatusMonitor(): void {
-    if (this.refreshTicker) {
-      clearInterval(this.refreshTicker);
-      this.refreshTicker = null;
-    }
+    this.stopStatusMonitor();
 
     this.refreshTicker = setInterval(() => {
       this.getTopologyStatus();
     }, REFRESH_INTERVAL);
+  }
+
+  private stopStatusMonitor(): void {
+    if (this.refreshTicker) {
+      clearInterval(this.refreshTicker);
+      this.refreshTicker = null;
+    }
   }
 
   private getTopologyStatus(): void {
