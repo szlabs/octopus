@@ -28,7 +28,7 @@ export class ReplicationRuleComponent implements OnInit {
       replicate_deletion: true,
       filters: [],
       trigger: {
-        kind: "Manual",
+        kind: "Immediate",
         schedule_param: {//for placeholder
           type: "Daily",
           weekday: 1,

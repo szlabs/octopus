@@ -33,3 +33,25 @@ export interface EdgeRequest {
     dst_node_id: string;
     policy: PolicyRequest;
 }
+
+export interface Job {
+    id: number;
+    status: string;
+    repository: string;
+    policy_id: number;
+    operation: string;
+    tags: string[];
+    creation_time: Date;
+    update_time: Date;
+}
+
+export interface JobStats {
+    total: number;
+    runningOnes: number;
+    failedOnes: number;
+    successOnes: number;
+}
+
+export interface JobStatsSummary<JobStats> {
+    [key: string] : JobStats;
+}

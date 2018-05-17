@@ -1,16 +1,29 @@
 <div class="side-stats">
     <span (click)="back()">
-      <clr-icon shape="angle-double" class="angle-arrow" style="margin-left: -20px;"></clr-icon>
-      <clr-icon shape="angle-double" class="angle-arrow" style="margin-left: -10px;"></clr-icon>
+        <clr-icon shape="angle-double" class="angle-arrow" style="margin-left: -20px;"></clr-icon>
+        <clr-icon shape="angle-double" class="angle-arrow" style="margin-left: -10px;"></clr-icon>
     </span>
-    <h3>Replication Statistics:</h3>
+    <h3>Replication Statistics:
+        <span class="spinner spinner-inline spinner-md" [hidden]="!onGoing">
+            Loading...
+        </span>
+    </h3>
+    <div>
+        <clr-alert [clrAlertType]="'alert-danger'" [(clrAlertClosed)]="closed">
+            <div class="alert-item">
+                <span class="alert-text">
+                        {{alertMessage}}
+                    </span>
+            </div>
+        </clr-alert>
+    </div>
     <div class="card">
         <div class="card-block">
             <div class="progress top">
                 <progress value="100" max="100"></progress>
             </div>
             <h4 class="card-title stat-title">TOTAL:</h4>
-            <p class="card-text stat-number">80</p>
+            <p class="card-text stat-number">{{total}}</p>
         </div>
     </div>
     <div class="card">
@@ -19,7 +32,7 @@
                 <progress value="100" max="100"></progress>
             </div>
             <h4 class="card-title stat-title">RUNNING:</h4>
-            <p class="card-text stat-number">5</p>
+            <p class="card-text stat-number">{{runningOnes}}</p>
         </div>
     </div>
     <div class="card">
@@ -28,7 +41,7 @@
                 <progress value="100" max="100"></progress>
             </div>
             <h4 class="card-title stat-title">SUCCESS</h4>
-            <p class="card-text stat-number stat-success">70</p>
+            <p class="card-text stat-number stat-success">{{successOnes}}</p>
         </div>
     </div>
     <div class="card">
@@ -37,7 +50,7 @@
                 <progress value="100" max="100"></progress>
             </div>
             <h4 class="card-title stat-title">ERROR</h4>
-            <p class="card-text stat-number stat-error">5</p>
+            <p class="card-text stat-number stat-error">{{errorOnes}}</p>
         </div>
     </div>
 </div>

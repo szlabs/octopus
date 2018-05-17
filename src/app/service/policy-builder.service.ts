@@ -4,12 +4,14 @@ import { Topology } from '../interface/topology';
 import { HTTP_JSON_OPTIONS } from './options';
 import { RegistryServer } from '../interface/registry-server';
 import { Project } from '../interface/replication';
-import { EdgeRequest } from '../interface/replication';
+import { EdgeRequest, Job } from '../interface/replication';
 
 const TOPOLOGY_URL = "/api/v1/topology";
 const TOPOLOGY_NODES_URL = "/api/v1/topology/nodes";
 const PROJECT_LIST = "/api/v1/registries/{id}/projects";
 const TOPOLOGY_EDGES_URL = "/api/v1/topology/edges";
+const TOPOLOGY_EDGE_STATS = "/api/v1/topology/edges/{id}/status";
+const TOPOLOGY_STATS = "/api/v1/topology/status";
 
 @Injectable()
 export class PolicyBuilderService {
@@ -57,6 +59,18 @@ export class PolicyBuilderService {
   public removeEdge(id: string): Promise<any> {
     return this.http.delete(TOPOLOGY_EDGES_URL + '/' + id, HTTP_JSON_OPTIONS).toPromise()
     .then(() => Promise.resolve(true))
+    .catch(error => Promise.reject(error));
+  }
+
+  public getEdgeStats(id: string): Promise<Job[]> {
+    return this.http.get(TOPOLOGY_EDGE_STATS.replace("{id}", id), HTTP_JSON_OPTIONS).toPromise()
+    .then(response => response.json() as Job[])
+    .catch(error => Promise.reject(error));
+  }
+
+  public getTopologyStats(): Promise<any> {
+    return this.http.get(TOPOLOGY_STATS, HTTP_JSON_OPTIONS).toPromise()
+    .then(response => Promise.resolve(response.json()))
     .catch(error => Promise.reject(error));
   }
 

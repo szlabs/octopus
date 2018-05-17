@@ -86,3 +86,6 @@ export const ALERT_DANGER = "alert-danger";
 export const EVENT_CANCEL_CREATING_EDGE = "x-creating-edge";
 export const EVENT_NODE_REMOVED = "x-node-removed";
 export const EVENT_EDGE_REMOVED = "x-edge-removed";
+export const STATUS_RUNNING = "running";
+export const STATUS_SUCCESS = "finished";
+export const STATUS_ERROR = "error";
