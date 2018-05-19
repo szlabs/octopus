@@ -1,5 +1,5 @@
 # Octopus
-<img alt="Harbor" src="images/logo.png">
+<img alt="Harbor" src="images/logo.png =118x123">
 
 Project **octopus** is incubated from and built on the popular open source project **[Harbor](https://github.com/vmware/harbor)**, which is an enterprise-class registry server that stores and distributes container images. 
 
