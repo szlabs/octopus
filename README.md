@@ -1,5 +1,35 @@
-# topological-replication
-Replicate container images between multiple sites/datacenters with visual topological structured policy.
+# Octopus
+<img alt="Harbor" src="images/logo.png">
+
+Project **octopus** is incubated from and built on the popular open source project **[Harbor](https://github.com/vmware/harbor)**, which is an enterprise-class registry server that stores and distributes container images. 
+
+Project **octopus** is designed to replicate container images between multiple image registry instances which are located in different sites/datacenters with visual topological structured policy.
+
+**Limitation:** Currently, it only supports Harbor instances. In future, it will support more registry types like `DockerHub` etc.
+
+**Project Status: Incubating**
+
+## Main features
+The project **octopus** provides the following main features:
+* Web console
+* Manage multiple Harbor instances with health status checking
+* Provide an orchestrating builder to design the topological replication policy among multiple instances
+* Monitor the replication status with a unified view
+* Provide replication statistics
+
+## Screenshots
+Registry management:
+<img alt="Harbor" src="images/registry-mgmt.png">
+
+Topological policy orchestrate:
+<img alt="Harbor" src="images/topological-policy.png">
+
+## Contributors
+**Originator:** [Steven Zou](mailto:szou@vmware.com)
+
+**Contributors**:
+* [Steven Zou](mailto:szou@vmware.com)
+* [Wen Kai Yin](mailto:yinw@vmware.com)
 
 ## How to run
 
