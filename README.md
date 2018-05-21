@@ -25,11 +25,11 @@ Topological policy orchestrate:
 <img alt="Harbor" src="images/topological-policy.png">
 
 ## Contributors
-**Originator:** [Steven Zou](mailto:szou@vmware.com)
+**Originator:** [Steven Zou](https://github.com/steven-zou)
 
 **Contributors**:
-* [Steven Zou](mailto:szou@vmware.com)
-* [Wen Kai Yin](mailto:yinw@vmware.com)
+* [Steven Zou](https://github.com/steven-zou)
+* [Wen Kai Yin](https://github.com/ywk253100)
 
 ## How to run
 
