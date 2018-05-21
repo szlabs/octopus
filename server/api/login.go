@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/steven-zou/topological-replication/server/model"
+	"github.com/harbor-incubator/octopus/server/model"
 )
 
 func Login(rw http.ResponseWriter, r *http.Request) {

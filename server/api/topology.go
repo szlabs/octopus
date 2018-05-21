@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/steven-zou/topological-replication/server/core"
-	"github.com/steven-zou/topological-replication/server/model"
-	"github.com/steven-zou/topological-replication/server/util"
+	"github.com/harbor-incubator/octopus/server/core"
+	"github.com/harbor-incubator/octopus/server/model"
+	"github.com/harbor-incubator/octopus/server/util"
 	common_http "github.com/vmware/harbor/src/common/http"
 )
 

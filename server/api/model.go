@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/steven-zou/topological-replication/server/model"
+	"github.com/harbor-incubator/octopus/server/model"
 )
 
 type edgeReq struct {

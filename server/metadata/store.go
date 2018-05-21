@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/harbor-incubator/octopus/server/model"
 	uuid "github.com/satori/go.uuid"
-	"github.com/steven-zou/topological-replication/server/model"
 )
 
 var (

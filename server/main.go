@@ -9,14 +9,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/steven-zou/topological-replication/server/model"
+	"github.com/harbor-incubator/octopus/server/model"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/steven-zou/topological-replication/server/api"
-	"github.com/steven-zou/topological-replication/server/core"
-	"github.com/steven-zou/topological-replication/server/metadata"
+	"github.com/harbor-incubator/octopus/server/api"
+	"github.com/harbor-incubator/octopus/server/core"
+	"github.com/harbor-incubator/octopus/server/metadata"
 )
 
 var (

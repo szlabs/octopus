@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/steven-zou/topological-replication/server/model"
+	"github.com/harbor-incubator/octopus/server/model"
 	common_http "github.com/vmware/harbor/src/common/http"
 )
 

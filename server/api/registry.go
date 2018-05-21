@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/steven-zou/topological-replication/server/core"
-	"github.com/steven-zou/topological-replication/server/model"
-	"github.com/steven-zou/topological-replication/server/util"
+	"github.com/harbor-incubator/octopus/server/core"
+	"github.com/harbor-incubator/octopus/server/model"
+	"github.com/harbor-incubator/octopus/server/util"
 )
 
 func GetRegistry(rw http.ResponseWriter, r *http.Request) {

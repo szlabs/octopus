@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/steven-zou/topological-replication/server/metadata"
-	"github.com/steven-zou/topological-replication/server/model"
-	"github.com/steven-zou/topological-replication/server/util"
+	"github.com/harbor-incubator/octopus/server/metadata"
+	"github.com/harbor-incubator/octopus/server/model"
+	"github.com/harbor-incubator/octopus/server/util"
 )
 
 var (
